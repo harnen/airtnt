@@ -376,11 +376,25 @@ sgx_status_t put_secret_data(
                                             (p_gcm_mac));
         uint32_t i;
         bool secret_match = true;
+        char blinker[] = {
+            0,0,0,
+            1,1,1,
+            0,0,0
+        };
+        int steps = 10;
+        int size = 3;
+        char *fa, *fb, *tt, *tmp;
 
-        if(!secret_match)
-        {
-            ret = SGX_ERROR_UNEXPECTED;
+        tmp=(char*) malloc(size * size * sizeof(char));
+        fa=blinker;
+        fb=tmp;
+
+        for(i = 0; i < steps; i++){
+            evolve(fa, fb, size);
+            tt = fb; fb = fa; fa = tt;
         }
+
+        free(tmp);
 
         // Once the server has the shared secret, it should be sealed to
         // persistent storage for future use. This will prevents having to
