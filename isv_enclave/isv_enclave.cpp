@@ -341,6 +341,22 @@ sgx_status_t verify_att_result_mac(sgx_ra_context_t context,
 // @return SGX_ERROR_UNEXPECTED - the secret doesn't match the
 //         expected value.
 
+void simulate(int size, int steps, char* array){
+    char *fa, *fb, *tt, *tmp;
+    int i;
+
+    tmp=(char*) malloc(size * size * sizeof(char));
+    fa=array;
+    fb=tmp;
+
+    for(i = 0; i < steps; i++){
+        evolve(fa, fb, size);
+        tt = fb; fb = fa; fa = tt;
+    }
+
+    free(tmp);
+}
+
 sgx_status_t put_secret_data(
     sgx_ra_context_t context,
     uint8_t *p_secret,
@@ -374,27 +390,10 @@ sgx_status_t put_secret_data(
                                          0,
                                          (const sgx_aes_gcm_128bit_tag_t *)
                                             (p_gcm_mac));
-        uint32_t i;
-        bool secret_match = true;
-        char blinker[] = {
-            0,0,0,
-            1,1,1,
-            0,0,0
-        };
-        int steps = 10;
-        int size = 3;
-        char *fa, *fb, *tt, *tmp;
 
-        tmp=(char*) malloc(size * size * sizeof(char));
-        fa=blinker;
-        fb=tmp;
-
-        for(i = 0; i < steps; i++){
-            evolve(fa, fb, size);
-            tt = fb; fb = fa; fa = tt;
-        }
-
-        free(tmp);
+       
+        life_input_t* input = (life_input_t*) p_secret;
+        simulate(input->size, input->steps, input->array);
 
         // Once the server has the shared secret, it should be sealed to
         // persistent storage for future use. This will prevents having to
@@ -402,21 +401,5 @@ sgx_status_t put_secret_data(
         // enclave is created again, the secret can be unsealed.
     } while(0);
     return ret;
-}
-
-void simulate(int size, int steps, char* array){
-    char *fa, *fb, *tt, *tmp;
-    int i;
-
-    tmp=(char*) malloc(size * size * sizeof(char));
-    fa=array;
-    fb=tmp;
-
-    for(i = 0; i < steps; i++){
-        evolve(fa, fb, size);
-        tt = fb; fb = fa; fa = tt;
-    }
-
-    free(tmp);
 }
 
