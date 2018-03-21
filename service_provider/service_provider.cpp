@@ -44,6 +44,8 @@
 #include <string.h>
 #include "ias_ra.h"
 
+
+
 #ifndef SAFE_FREE
 #define SAFE_FREE(ptr) {if (NULL != (ptr)) {free(ptr); (ptr) = NULL;}}
 #endif
@@ -106,7 +108,9 @@ static bool g_is_sp_registered = false;
 static int g_sp_credentials = 0;
 static int g_authentication_token = 0;
 
-uint8_t g_secret[8] = {0,1,2,3,4,5,6,7};
+//uint8_t g_secret[8] = {0,1,2,3,4,5,6,7};
+unsigned int size = 4;
+unsigned long msg_size = sizeof(life_input_t) + (size * size * sizeof(char));
 
 sample_spid_t g_spid;
 
@@ -604,7 +608,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
         uint32_t att_result_msg_size = sizeof(sample_ra_att_result_msg_t);
         p_att_result_msg_full =
             (ra_samp_response_header_t*)malloc(att_result_msg_size
-            + sizeof(ra_samp_response_header_t) + sizeof(g_secret));
+            + sizeof(ra_samp_response_header_t) + msg_size);
         if(!p_att_result_msg_full)
         {
             fprintf(stderr, "\nError, out of memory in [%s].", __FUNCTION__);
@@ -612,7 +616,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
             break;
         }
         memset(p_att_result_msg_full, 0, att_result_msg_size
-               + sizeof(ra_samp_response_header_t) + sizeof(g_secret));
+               + sizeof(ra_samp_response_header_t) + msg_size);
         p_att_result_msg_full->type = TYPE_RA_ATT_RESULT;
         p_att_result_msg_full->size = att_result_msg_size;
         if(IAS_QUOTE_OK != attestation_report.status)
@@ -702,15 +706,33 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
         }
 
         // Generate shared secret and encrypt it with SK, if attestation passed.
+       
+    
+        life_input_t* input = (life_input_t*) malloc(msg_size);
+        input->size = size;
+        input->steps = 100;
+        memset(&input->array[0], '0', size * size);        
+        input->array[3] = '1';
+        input->array[4] = '1';
+        input->array[5] = '1';
+
+        printf("Created an input message. Size: %lu\n", msg_size);
+        for(int i = 0; i < size; i++){
+            for(int j = 0; j < size; j++){
+                printf("%c ", input->array[i*size + j]);
+            }
+            printf("\n");
+        } 
+
         uint8_t aes_gcm_iv[SAMPLE_SP_IV_SIZE] = {0};
-        p_att_result_msg->secret.payload_size = 8;
+        p_att_result_msg->secret.payload_size = msg_size;
         if((IAS_QUOTE_OK == attestation_report.status) &&
            (IAS_PSE_OK == attestation_report.pse_status) &&
            (isv_policy_passed == true))
         {
             ret = sample_rijndael128GCM_encrypt(&g_sp_db.sk_key,
-                        &g_secret[0],
-                        p_att_result_msg->secret.payload_size,
+                        (uint8_t*) input,
+                        msg_size,
                         p_att_result_msg->secret.payload,
                         &aes_gcm_iv[0],
                         SAMPLE_SP_IV_SIZE,
@@ -732,7 +754,4 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
     }
     return ret;
 }
-
-
-
 

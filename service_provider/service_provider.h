@@ -154,6 +154,13 @@ typedef struct sample_extended_epid_group
     sample_verify_attestation_evidence verify_attestation_evidence;
 } sample_extended_epid_group;
 
+typedef struct life_input
+{
+    uint8_t size;
+    uint8_t steps;
+    char array[]; 
+} life_input_t;
+
 #ifdef  __cplusplus
 }
 #endif

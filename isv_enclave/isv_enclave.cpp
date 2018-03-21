@@ -68,7 +68,7 @@ static const sgx_ec256_public_t g_sp_pub_key = {
 // Used to store the secret passed by the SP in the sample code. The
 // size is forced to be 8 bytes. Expected value is
 // 0x01,0x02,0x03,0x04,0x0x5,0x0x6,0x0x7
-uint8_t g_secret[8] = {0};
+uint8_t g_secret[18] = {0};
 
 
 #ifdef SUPPLIED_KEY_DERIVATION
@@ -351,11 +351,11 @@ sgx_status_t put_secret_data(
     sgx_ec_key_128bit_t sk_key;
 
     do {
-        if(secret_size != 8)
+        /*if(secret_size != 8)
         {
             ret = SGX_ERROR_INVALID_PARAMETER;
             break;
-        }
+        }*/
 
         ret = sgx_ra_get_keys(context, SGX_RA_KEY_SK, &sk_key);
         if(SGX_SUCCESS != ret)
@@ -374,16 +374,8 @@ sgx_status_t put_secret_data(
                                          0,
                                          (const sgx_aes_gcm_128bit_tag_t *)
                                             (p_gcm_mac));
-
         uint32_t i;
         bool secret_match = true;
-        for(i=0;i<secret_size;i++)
-        {
-            if(g_secret[i] != i)
-            {
-                secret_match = false;
-            }
-        }
 
         if(!secret_match)
         {
@@ -397,3 +389,20 @@ sgx_status_t put_secret_data(
     } while(0);
     return ret;
 }
+
+void simulate(int size, int steps, char* array){
+    char *fa, *fb, *tt, *tmp;
+    int i;
+
+    tmp=(char*) malloc(size * size * sizeof(char));
+    fa=array;
+    fb=tmp;
+
+    for(i = 0; i < steps; i++){
+        evolve(fa, fb, size);
+        tt = fb; fb = fa; fa = tt;
+    }
+
+    free(tmp);
+}
+

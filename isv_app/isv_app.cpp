@@ -628,6 +628,7 @@ int main(int argc, char* argv[])
             goto CLEANUP;
         }
 
+
         bool attestation_passed = true;
         // Check the attestation result for pass or fail.
         // Whether attestation passes or fails is a decision made by the ISV Server.
@@ -640,6 +641,7 @@ int main(int argc, char* argv[])
                             "failed in [%s].", __FUNCTION__);
             attestation_passed = false;
         }
+        
 
         // The attestation result message should contain a field for the Platform
         // Info Blob (PIB).  The PIB is returned by attestation server in the attestation report.
@@ -659,6 +661,9 @@ int main(int argc, char* argv[])
         // passed)
         if(attestation_passed)
         {
+
+            printf("Received msg size: %d\n", p_att_result_msg_body->secret.payload_size);
+
             ret = put_secret_data(enclave_id,
                                   &status,
                                   context,
