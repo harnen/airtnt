@@ -392,8 +392,10 @@ sgx_status_t put_secret_data(
                                             (p_gcm_mac));
 
        
-        life_input_t* input = (life_input_t*) p_secret;
-        simulate(input->size, input->steps, input->array);
+        life_input_t* input = (life_input_t*) g_secret;
+        int size = input->size;
+        int steps = input->steps;
+//        simulate(input->size, input->steps, input->array);
 
         // Once the server has the shared secret, it should be sealed to
         // persistent storage for future use. This will prevents having to
