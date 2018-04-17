@@ -40,7 +40,7 @@ void character_recognition(int** input, int rows, int cols, const vector<Letter>
  * find_letters
  * find all letters in a 2d vector image.
  */
-vector<Letter> find_letters(const int& threshold, const vector<vector<int>> matrix) {
+vector<Letter> find_letters(const int& threshold, const vector< vector<int> > matrix) {
 	vector<Letter> letters;
 
 	// initialize impossible base values
@@ -72,7 +72,7 @@ vector<Letter> find_letters(const int& threshold, const vector<vector<int>> matr
 		else {
 			if (leftEdge > 0) {
 				// we've found the right edge, so we found a shape
-				vector< vector < int > > subMatrix;
+				vector< vector<int> > subMatrix;
 
 				// copy the shape to a new matrix
 				for (int subx = leftEdge; subx < x; subx++) {

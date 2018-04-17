@@ -25,15 +25,15 @@ int Letter::getY() const {
 void Letter::setY(int y) {
 	this->y = y;
 }
-const vector<vector<int> >& Letter::getMatrix() const {
+const vector< vector<int> >& Letter::getMatrix() const {
 	return matrix;
 }
-void Letter::setMatrix(const vector<vector<int> >& matrix) {
+void Letter::setMatrix(const vector< vector<int> >& matrix) {
 	this->matrix = matrix;
 }
 
 // initialize a new letter object
-Letter::Letter(vector < vector < int > > matrix) {
+Letter::Letter(vector< vector<int> > matrix) {
 	this->matrix=matrix;
 	this->x=0;
 	this->y=0;

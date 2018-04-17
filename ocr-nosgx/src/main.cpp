@@ -18,20 +18,20 @@ int main() {
 
 	// load alphabet
 	char const *image_alphabet = "../data/image_alphabet.png";
-	char const *text_alphabet = "../data/text_alphabet.txt";
+	char const *text_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	int const alphabet_length = 26;
+
+
+
+	// test
+
+
+
 
 	vector<Letter> letters;
-	int ret = load_alphabet(image_alphabet, text_alphabet, &letters);
-	if (ret == 1) {
+	int ret = load_alphabet(image_alphabet, text_alphabet, alphabet_length, &letters);
+	if (ret != 0) {
 		printf("Could not load alphabet image file: %s\n", image_alphabet);
-		return -1;
-	}
-	else if (ret == 2) {
-		printf("Could not load alphabet text file: %s\n", text_alphabet);
-		return -1;
-	}
-	else if (ret != 0) {
-		printf("Could not load alphabet.\n");
 		return -1;
 	}
 

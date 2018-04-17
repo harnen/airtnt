@@ -29,7 +29,7 @@ const double BLUE_WEIGHT = 0.114;
  * load_alphabet
  * load an image-database file and a text cile containing all letters in the alphabet.
  */
-int load_alphabet(const char *image_alphabet, const char *text_alphabet, vector<Letter> *letters);
+int load_alphabet(const char *image_alphabet, const char *text_alphabet, const int alphabet_length, vector<Letter> *letters);
 
 /*
  * load_image
