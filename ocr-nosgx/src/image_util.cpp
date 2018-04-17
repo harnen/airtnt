@@ -22,6 +22,7 @@ int load_alphabet(const char *image_alphabet, const char *text_alphabet, const i
 	for(int i=0; i<alphabet_length; i++) {
 		char c = text_alphabet[i];
 		(*letters).at(i).setLetter(c);
+		printf("%d\n", (*letters)[i].getMatrix());
 	}
 	return 0;
 }

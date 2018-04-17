@@ -11,6 +11,9 @@
 using namespace std;
 
 
+#include <fstream>
+#include <string>
+
 // ============================================================================
 // main
 // ============================================================================
@@ -23,7 +26,14 @@ int main() {
 
 
 
+
+
 	// test
+	ifstream fin(image_alphabet, std::ios::binary);
+	string data((istreambuf_iterator<char>(fin)), istreambuf_iterator<char>());
+	//printf("%s\n", data);
+
+
 
 
 
