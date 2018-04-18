@@ -411,17 +411,18 @@ sgx_status_t put_secret_data(
         *result_size = sizeof(sgx_aes_gcm_128bit_key_t);
        
         //generate a random encryption key
-        //sgx_read_rand(result_key, SGX_AESGCM_KEY_SIZE); 
-        for(int i = 0; i < sizeof(*result_key); i++){
-            (*result_key)[i] = 100 + i;
-        }
+        sgx_read_rand((unsigned char*) result_key, sizeof(*result_key)); 
 
         //initialization vector - we keep it everywhere the same for now
         uint8_t result_iv[12] = {0};
-        uint8_t buf[3] = {0,1,2};
+        uint8_t buf[secret_size];
+
+        for(int i = 0; i < secret_size; i++){
+            buf[i] = secret_size;
+        }
         sgx_rijndael128GCM_encrypt(result_key,
                                     buf, //(const uint8_t*) input,
-                                    3,//secret_size, //output is the same size as the input
+                                    secret_size, //output is the same size as the input
                                     result,
                                     &result_iv[0],
                                     12,          //recommended value

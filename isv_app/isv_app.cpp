@@ -667,7 +667,7 @@ int main(int argc, char* argv[])
             printf("Received msg size: %d\n", p_att_result_msg_body->secret.payload_size);
 
             int result_size;
-            uint8_t result[16];
+            uint8_t* result = (uint8_t*) malloc(p_att_result_msg_body->secret.payload_size);
             sgx_aes_gcm_128bit_key_t result_key;
             for(int i =  0; i < SGX_AESGCM_KEY_SIZE; i++){
                 result_key[i] = i;
@@ -717,12 +717,11 @@ int main(int argc, char* argv[])
             uint8_t result_iv[12] = {0};
             sgx_aes_gcm_128bit_key_t* result_key_ = (sgx_aes_gcm_128bit_key_t*) &result_key;
 
-            uint8_t* buffer = (uint8_t*) malloc(p_att_result_msg_body->secret.payload_size);
-            uint8_t decrypted[3];
+            uint8_t decrypted[p_att_result_msg_body->secret.payload_size];
 
             int dec_enc_status = decrypt(result_key,
                                          result,
-                                         3,//p_att_result_msg_body->secret.payload_size, //output is the same size as intput
+                                         p_att_result_msg_body->secret.payload_size, //output is the same size as intput
                                          decrypted,
                                          &result_iv[0],
                                          12,
@@ -731,18 +730,18 @@ int main(int argc, char* argv[])
                                          out_mac);
             
             printf("Decrypted buffer from the enclave:");
-            for(int i = 0; i < 3; i++){
+            for(int i = 0; i < p_att_result_msg_body->secret.payload_size; i++){
                 printf("%d,", decrypted[i]);
             } 
             printf("\n");
             
             if(dec_enc_status > -1){
-                printf("Enclave Decryption Successfull\n");
+                printf("Enclave Decryption Successful\n");
             }else{
                 printf("Enclave Decryption Failed\n");
             }
-            free(buffer);
 
+            free(result);
 
  
             if((SGX_SUCCESS != ret)  || (SGX_SUCCESS != status))
