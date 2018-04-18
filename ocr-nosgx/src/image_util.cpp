@@ -6,9 +6,76 @@
 #include "image_util.h"
 
 
+
+/*
+ * load_template
+ * load letter representations (template) from file; these are created by 'create_template'
+ */
+void load_template(vector<Letter> *letters, const int alphabet_length) {
+	// read template from file
+	char filename[6];
+	for(int i=0; i<alphabet_length; i++) {
+		sprintf(filename, "%d.sav", i);
+		ifstream fin(filename);
+			
+		// init buffers
+		int const rows = sizes[i][0];
+		int const cols = sizes[i][1];
+		int data[rows * cols + 3];
+
+		// read file
+		int j=0, x;
+		while (fin >> x) {
+			data[j++] = x;
+		}
+
+		// import letter
+		Letter tmp = Letter::importLetter(data, rows, cols);
+		(*letters).push_back(tmp);
+		fin.close();
+	}
+}
+
+
+/*
+ * create_template
+ * load an image-database file and a text file containing all letters in the alphabet;
+ * and save a letter representation in a file (for each letter)
+ */
+int create_template(const char *image_alphabet, const char *text_alphabet, const int alphabet_length) {
+	// load alphabet
+	vector<Letter> letters;
+	int ret = load_alphabet(image_alphabet, text_alphabet, alphabet_length, &letters);
+	if (ret != 0) {return 1;}
+
+	// save letters to file
+	ofstream file;
+	char filename[6];
+	for(int i=0; i<letters.size(); i++) {
+		// open file
+		sprintf(filename, "%d.sav", i);
+		file.open(filename);
+
+		// export letter
+		vector< vector<int> > matrix = letters[i].getMatrix();
+		int data_length = matrix.size() * matrix[0].size() + 3;
+		int data[data_length];
+		letters[i].exportLetter(data);
+		
+		// save letter
+		for(int i=0; i<data_length; i++) {
+			file << (int)data[i] << " ";
+		}
+		file.close();
+	}
+
+	return 0;
+}
+
+
 /*
  * load_alphabet
- * load an image-database file and a text cile containing all letters in the alphabet.
+ * load an image-database file and a text file containing all letters in the alphabet.
  */
 int load_alphabet(const char *image_alphabet, const char *text_alphabet, const int alphabet_length, vector<Letter> *letters) {
 	// load the databse image file - image file containing evey letters
