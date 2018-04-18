@@ -41,6 +41,8 @@ void load_template(vector<Letter> *letters, const int alphabet_length) {
  * create_template
  * load an image-database file and a text file containing all letters in the alphabet;
  * and save a letter representation in a file (for each letter)
+ * 
+ * Note: the .sav files created should be encrypted
  */
 int create_template(const char *image_alphabet, const char *text_alphabet, const int alphabet_length) {
 	// load alphabet
