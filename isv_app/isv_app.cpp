@@ -66,7 +66,9 @@
 // messages and the information flow.
 #include "sample_messages.h"
 
-
+#include "sgx_tcrypto.h"
+#include "sample_libcrypto.h" 
+#include "crypto.h"
 #define ENCLAVE_PATH "isv_enclave.signed.so"
 
 uint8_t* msg1_samples[] = { msg1_sample1, msg1_sample2 };
@@ -664,12 +666,85 @@ int main(int argc, char* argv[])
 
             printf("Received msg size: %d\n", p_att_result_msg_body->secret.payload_size);
 
+            int result_size;
+            uint8_t result[16];
+            sgx_aes_gcm_128bit_key_t result_key;
+            for(int i =  0; i < SGX_AESGCM_KEY_SIZE; i++){
+                result_key[i] = i;
+            }
+
+            sgx_aes_gcm_128bit_tag_t out_mac;
+            for(int i =  0; i < SGX_AESGCM_MAC_SIZE; i++){
+                out_mac[i] = i;
+            }
+            printf("Orig mac:");
+            for(int i =  0; i < SGX_AESGCM_MAC_SIZE; i++){
+              printf("%d,", out_mac[i]);
+            }
+            printf("\n");
+
+
+            printf("Orig key:");
+            for(int i =  0; i < SGX_AESGCM_KEY_SIZE; i++){
+              printf("%d,", result_key[i]);
+            }
+            printf("\n");
+
             ret = put_secret_data(enclave_id,
                                   &status,
                                   context,
                                   p_att_result_msg_body->secret.payload,
                                   p_att_result_msg_body->secret.payload_size,
-                                  p_att_result_msg_body->secret.payload_tag);
+                                  p_att_result_msg_body->secret.payload_tag,
+                                  result,
+                                  &result_size,
+                                  &result_key,
+                                  &out_mac);
+
+            printf("Got result size: %d\n", result_size); 
+            printf("Got key:");
+            for(int i =  0; i < SGX_AESGCM_KEY_SIZE; i++){
+              printf("%d,", result_key[i]);
+            }
+            printf("\n");
+
+            printf("Got mac:");
+            for(int i =  0; i < SGX_AESGCM_MAC_SIZE; i++){
+              printf("%d,", out_mac[i]);
+            }
+            printf("\n");
+            //initialization vector - we keep it everywhere the same for now
+            uint8_t result_iv[12] = {0};
+            sgx_aes_gcm_128bit_key_t* result_key_ = (sgx_aes_gcm_128bit_key_t*) &result_key;
+
+            uint8_t* buffer = (uint8_t*) malloc(p_att_result_msg_body->secret.payload_size);
+            uint8_t decrypted[3];
+
+            int dec_enc_status = decrypt(result_key,
+                                         result,
+                                         3,//p_att_result_msg_body->secret.payload_size, //output is the same size as intput
+                                         decrypted,
+                                         &result_iv[0],
+                                         12,
+                                         NULL,
+                                         0,
+                                         out_mac);
+            
+            printf("Decrypted buffer from the enclave:");
+            for(int i = 0; i < 3; i++){
+                printf("%d,", decrypted[i]);
+            } 
+            printf("\n");
+            
+            if(dec_enc_status > -1){
+                printf("Enclave Decryption Successfull\n");
+            }else{
+                printf("Enclave Decryption Failed\n");
+            }
+            free(buffer);
+
+
+ 
             if((SGX_SUCCESS != ret)  || (SGX_SUCCESS != status))
             {
                 fprintf(OUTPUT, "\nError, attestation result message secret "

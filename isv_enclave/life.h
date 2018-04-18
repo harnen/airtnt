@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #define CELL(I,J) (field[size*(I)+(J)])
 #define ALIVE(I,J) t[size*(I)+(J)] = 1
 #define DEAD(I,J)  t[size*(I)+(J)] = 0
