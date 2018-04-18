@@ -24,6 +24,13 @@ int main() {
 	char const *text_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	int const alphabet_length = 26;
 
+	vector<Letter> letters;
+	int ret = load_alphabet(image_alphabet, text_alphabet, alphabet_length, &letters);
+	if (ret != 0) {
+		printf("Could not load alphabet image file: %s\n", image_alphabet);
+		return -1;
+	}
+
 
 
 
@@ -33,17 +40,28 @@ int main() {
 	string data((istreambuf_iterator<char>(fin)), istreambuf_iterator<char>());
 	//printf("%s\n", data);
 
+	for(int i=0; i<letters.size(); i++) {
 
+		vector< vector<int> > matrix = letters[i].getMatrix();
 
+		int data[matrix.size()+matrix[0].size()+3];
 
+		letters[i].exportLetter(data);
 
-
-	vector<Letter> letters;
-	int ret = load_alphabet(image_alphabet, text_alphabet, alphabet_length, &letters);
-	if (ret != 0) {
-		printf("Could not load alphabet image file: %s\n", image_alphabet);
-		return -1;
+		// print
+		for(int j=0; j<matrix.size(); j++) {
+			for(int k=0; k<matrix[0].size(); k++) {
+				//printf("%d", data[j+k]);
+			}
+		}
+		printf("%c\n", data[matrix.size()+matrix[0].size()+2]);
 	}
+
+
+
+
+
+
 
 
 	// load input
