@@ -47,32 +47,35 @@ void Letter::exportLetter(int data[]) {
 	//data[this->matrix.size() + this->matrix[0].size() + 3];
 
 	// export matrix
-	for (int i=0; i < matrix.size(); i++) {
-		for (int j=0; j < matrix[0].size(); j++) {
-			data[i+j] = matrix[i][j];
+	int rows = matrix.size();
+	int cols = matrix[0].size();
+	for (int i=0; i < rows; i++) {
+		for (int j=0; j < cols; j++) {
+			data[cols*i+j] = matrix[i][j];
 		}
 	}
 
 	// export x,y, char
-	data[matrix.size() + matrix[0].size() + 0] = x;
-	data[matrix.size() + matrix[0].size() + 1] = y;
-	data[matrix.size() + matrix[0].size() + 2] = letter;
+	data[matrix.size() * matrix[0].size() + 0] = x;
+	data[matrix.size() * matrix[0].size() + 1] = y;
+	data[matrix.size() * matrix[0].size() + 2] = (int) letter;
 }
 
-static Letter importLetter(const int *data, const int rows, const int cols) {
+Letter Letter::importLetter(const int data[], const int rows, const int cols) {
 	// set matrix
 	vector< vector<int> > new_matrix;
-	for (int i=0; i < rows; i) {
+	new_matrix.resize(rows, vector<int>(cols, 0));
+	for (int i=0; i < rows; i++) {
 		for (int j=0; j < cols; j++) {
-			new_matrix[i][j] = data[i+j];
+			new_matrix[i][j] = data[cols*i+j];
 		}
 	}
 	Letter letter(new_matrix);
 
 	// import x,y, char
-	letter.setX(data[rows+cols+0]);
-	letter.setY(data[rows+cols+1]);
-	letter.setLetter(data[rows+cols+2]);
+	letter.setX(data[rows * cols + 0]);
+	letter.setY(data[rows * cols + 1]);
+	letter.setLetter((char) data[rows * cols + 2]);
 
 	return letter;
 }

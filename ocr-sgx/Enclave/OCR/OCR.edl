@@ -1,0 +1,11 @@
+enclave {
+	
+	//include <vector>
+
+    trusted {
+    	
+        public void test_function([in] int* a, [in] int* b, [out] int* c);
+        //public void detect_letter([in] vector thresholdInputPixels, [out] int* out)
+
+    };
+};
