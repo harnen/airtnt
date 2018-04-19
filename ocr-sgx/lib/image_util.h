@@ -25,15 +25,6 @@ const double RED_WEIGHT = 0.299;
 const double GREEN_WEIGHT = 0.587;
 const double BLUE_WEIGHT = 0.114;
 
-// store letters matrix sizes
-// ugly -- should stay in a file create by 'create_template'
-const int sizes[26][2] = {
-	{62, 79}, {48, 79}, {51, 81}, {49, 79}, {41, 79}, {42, 79}, {52, 81}, {45, 79}, {36, 79},
-	{39, 80}, {55, 79}, {43, 79}, {50, 79}, {47, 79}, {54, 81}, {45, 79}, {56, 94}, {53, 79}, 
-	{44, 81}, {57, 79}, {45, 80}, {62, 79}, {63, 79}, {60, 79}, {58, 79}, {48, 79}
-};
-
-
 
 
 /*

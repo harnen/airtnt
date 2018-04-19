@@ -79,7 +79,7 @@ int main() {
 
     /********************** START ECALL **********************/
     // perform OCR on input
-    char recognised_letters[100];
+    char recognised_letters[100]; // make array big enough
     int length;
     character_recognition(input, rows, cols, letters_c, letters_rows, letters_cols, recognised_letters, &length);
 

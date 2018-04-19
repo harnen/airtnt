@@ -31,7 +31,6 @@ void character_recognition(int** input, int rows, int cols, int** letters_c, int
         	letters_vec[i][j] = letters_c[i][j];
         }
     }
-
     vector<Letter> letters;
     for(int i=0; i<letters_rows; i++) {
 		// export letter i
@@ -156,7 +155,7 @@ void match_letter(const Letter to_match, const vector<Letter> letters, Letter *b
  * scale_Matrix_to
  * scale a 2d vector matrix A to match the size of a matrix B.
  */
-vector< vector<int> > scale_Matrix_to(int width, int height, vector<vector<int>> oldMatrix) {
+vector< vector<int> > scale_Matrix_to(int width, int height, vector< vector<int> > oldMatrix) {
 	// init a matrix
 	vector< vector<int> > matrix;
 

@@ -11,7 +11,9 @@
  * perform OCR on an input image.
  * Note: the image is input as a int** double pointer for edger8r compilation.
  */
-void character_recognition(int** input, int rows, int cols, const vector<Letter> letters, char *output_letters, int *length) {
+void character_recognition(int** input, int rows, int cols, int** letters_c, int letters_rows, int letters_cols, 
+	char *output_letters, int *length) {
+
 	// convert input to vector
 	vector< vector<int> > input_image;
 	input_image.resize(rows, vector<int>(cols, 0));
@@ -21,16 +23,32 @@ void character_recognition(int** input, int rows, int cols, const vector<Letter>
         }
     }
 
+    // convert letters C-type to object
+    vector< vector<int> > letters_vec;
+	letters_vec.resize(letters_rows, vector<int>(letters_cols, 0));
+	for (int i = 0; i < letters_rows; ++i) {
+    	for (int j = 0; j < letters_cols; ++j) {
+        	letters_vec[i][j] = letters_c[i][j];
+        }
+    }
+    vector<Letter> letters;
+    for(int i=0; i<letters_rows; i++) {
+		// export letter i
+		int *data = letters_vec[i].data();
+		Letter tmp = Letter::importLetter(data, sizes[i][0], sizes[i][1]);
+		letters.push_back(tmp);
+	}
+
 	// find letters in image
-	vector<Letter> input_letter = find_letters(127, input_image);
+	vector<Letter> possible_letters = find_letters(127, input_image);
 
 	// set number of recognised letters
-	*length = input_letter.size();
+	*length = possible_letters.size();
 
 	// find the best match in the alphabet for each letter
-	for (int i = 0; i < input_letter.size(); i++) {
+	for (int i = 0; i < possible_letters.size(); i++) {
 		Letter match = letters.at(0); 
-		match_letter(input_letter.at(i), letters, &match);
+		match_letter(possible_letters.at(i), letters, &match);
 		output_letters[i] = match.getLetter();
 	}
 }

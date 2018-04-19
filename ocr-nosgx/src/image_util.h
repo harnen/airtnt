@@ -50,19 +50,19 @@ int load_alphabet(const char *image_alphabet, const char *text_alphabet, const i
  * load_image
  * load an image into a 2d vector.
  */
-int load_image(const char *image_file, vector<vector<int>> *pixels);
+int load_image(const char *image_file, vector< vector<int> > *pixels);
 
 /*
  * get_grayscale_pixels
  * convert an image into a grayscale 2d vector.
  */
-vector<vector<int>> get_grayscale_pixels(const Image& img);
+vector< vector<int> > get_grayscale_pixels(const Image& img);
 
 /*
  * apply_threshold
  * apply a threshold to a 2d vector representing a grayscale image.
  */
-vector<vector<int>> apply_threshold(const int& threshold, const vector<vector<int>> oldMatrix, int high, int low);
+vector< vector<int> > apply_threshold(const int& threshold, const vector< vector<int> > oldMatrix, int high, int low);
 
 
 
