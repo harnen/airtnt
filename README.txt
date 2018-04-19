@@ -30,3 +30,8 @@ How to Build/Execute the Sample Code
     $ ./app
 5. Remember to "make clean" before switching build mode
 6. Add libcrypto to the path before runnig: `export LD_LIBRARY_PATH=`pwd`/sample_libcrypto`
+
+** HTTPS Communication
+The implementation requires cpp-netlib v0.12-final http://cpp-netlib.org/
+
+In this version, there's a bug with HTTP version number. To fix it, apply https://github.com/cpp-netlib/cpp-netlib/pull/579/commits/2babeb4b114be2e4e2ee47303b8ae51f30b32e4e
