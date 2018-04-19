@@ -39,13 +39,13 @@ int main() {
 
 	// load input
 	char const *image_input = "../data/input_2.png";
-	vector<vector<int>> pixels;
+	vector< vector<int> > pixels;
 	if (load_image(image_input, &pixels) != 0) {
 		printf("Could not load input image: %s\n", image_input);
 		return -1;
 	}
 
-	// convert to C type for ECALL
+	// convert input to C type for ECALL
 	vector<int*> ptrs(pixels.size());
     transform(begin(pixels), end(pixels), begin(ptrs), [](std::vector<int> &inner_vec) {
         return inner_vec.data();
@@ -54,12 +54,34 @@ int main() {
    	int rows = pixels.size();
     int cols = pixels[0].size();
 
+    // convert alphabet letters to C type for ECALL
+    vector< vector<int> > letters_vec;
+    for(int i=0; i<letters.size(); i++) {
+		// export letter i
+		vector< vector<int> > matrix = letters[i].getMatrix();
+		int data_length = matrix.size() * matrix[0].size() + 3;
+		int data[data_length];
+		letters[i].exportLetter(data);
+		
+		// save letter
+		vector<int> tmp_vec (data, data + sizeof(data) / sizeof(data[0]) );
+		letters_vec.push_back(tmp_vec);
+	}
+	vector<int*> letters_ptrs(letters_vec.size());
+    transform(begin(letters_vec), end(letters_vec), begin(letters_ptrs), [](std::vector<int> &inner_vec) {
+        return inner_vec.data();
+    });
+    int **letters_c =  letters_ptrs.data();
+   	int letters_rows = letters_vec.size();
+    int letters_cols = letters_vec[0].size();
+
+
 
     /********************** START ECALL **********************/
     // perform OCR on input
     char recognised_letters[100];
     int length;
-    character_recognition(input, rows, cols, letters, recognised_letters, &length);
+    character_recognition(input, rows, cols, letters_c, letters_rows, letters_cols, recognised_letters, &length);
 
     /*********************** END ECALL ***********************/
 

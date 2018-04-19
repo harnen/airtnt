@@ -11,9 +11,11 @@
  * perform OCR on an input image.
  * Note: the image is input as a int** double pointer for edger8r compilation.
  */
-void character_recognition(int** input, int rows, int cols, const vector<Letter> letters, char *output_letters, int *length) {
+void character_recognition(int** input, int rows, int cols, int** letters_c, int letters_rows, int letters_cols, 
+	char *output_letters, int *length) {
+
 	// convert input to vector
-	vector<vector<int>> input_image;
+	vector< vector<int> > input_image;
 	input_image.resize(rows, vector<int>(cols, 0));
 	for (int i = 0; i < rows; ++i) {
     	for (int j = 0; j < cols; ++j) {
@@ -21,16 +23,33 @@ void character_recognition(int** input, int rows, int cols, const vector<Letter>
         }
     }
 
+    // convert letters C-type to object
+    vector< vector<int> > letters_vec;
+	letters_vec.resize(letters_rows, vector<int>(letters_cols, 0));
+	for (int i = 0; i < letters_rows; ++i) {
+    	for (int j = 0; j < letters_cols; ++j) {
+        	letters_vec[i][j] = letters_c[i][j];
+        }
+    }
+
+    vector<Letter> letters;
+    for(int i=0; i<letters_rows; i++) {
+		// export letter i
+		int *data = letters_vec[i].data();
+		Letter tmp = Letter::importLetter(data, sizes[i][0], sizes[i][1]);
+		letters.push_back(tmp);
+	}
+
 	// find letters in image
-	vector<Letter> input_letter = find_letters(127, input_image);
+	vector<Letter> possible_letters = find_letters(127, input_image);
 
 	// set number of recognised letters
-	*length = input_letter.size();
+	*length = possible_letters.size();
 
 	// find the best match in the alphabet for each letter
-	for (int i = 0; i < input_letter.size(); i++) {
+	for (int i = 0; i < possible_letters.size(); i++) {
 		Letter match = letters.at(0); 
-		match_letter(input_letter.at(i), letters, &match);
+		match_letter(possible_letters.at(i), letters, &match);
 		output_letters[i] = match.getLetter();
 	}
 }
@@ -137,9 +156,9 @@ void match_letter(const Letter to_match, const vector<Letter> letters, Letter *b
  * scale_Matrix_to
  * scale a 2d vector matrix A to match the size of a matrix B.
  */
-vector<vector<int>> scale_Matrix_to(int width, int height, vector<vector<int>> oldMatrix) {
+vector< vector<int> > scale_Matrix_to(int width, int height, vector<vector<int>> oldMatrix) {
 	// init a matrix
-	vector< vector < int > > matrix;
+	vector< vector<int> > matrix;
 
 	// compute scale factors
 	double wScaler = (double) oldMatrix.size() / (double) width;
@@ -161,7 +180,7 @@ vector<vector<int>> scale_Matrix_to(int width, int height, vector<vector<int>> o
  * compare_matrices
  * return the distance between two matrices A and B.
  */
-double compare_matrices(vector<vector<int>> matrixA, vector<vector<int>> matrixB) {
+double compare_matrices(vector< vector<int> > matrixA, vector< vector<int> > matrixB) {
 	int differenceSum = 0;
 
 	// compute differences betwieen matrices

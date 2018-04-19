@@ -72,7 +72,7 @@ vector<Letter> find_letters(const int& threshold, const vector< vector<int> > ma
 		else {
 			if (leftEdge > 0) {
 				// we've found the right edge, so we found a shape
-				vector< vector < int > > subMatrix;
+				vector< vector<int> > subMatrix;
 
 				// copy the shape to a new matrix
 				for (int subx = leftEdge; subx < x; subx++) {
@@ -139,7 +139,7 @@ void match_letter(const Letter to_match, const vector<Letter> letters, Letter *b
  */
 vector< vector<int> > scale_Matrix_to(int width, int height, vector< vector<int> > oldMatrix) {
 	// init a matrix
-	vector< vector <int> > matrix;
+	vector< vector<int> > matrix;
 
 	// compute scale factors
 	double wScaler = (double) oldMatrix.size() / (double) width;

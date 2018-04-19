@@ -29,7 +29,7 @@ private:
 	/**
 	 * A matrix containing
 	 */
-	vector < vector < int > > matrix;
+	vector< vector<int> > matrix;
 
 	/**
 	 * The x and y coordinates in the parent matrix of where the matrix was found
@@ -39,7 +39,7 @@ private:
 
 public:
 	//Initialize a new letter from a matrix
-	Letter(vector < vector < int > > matrix);
+	Letter(vector< vector<int> > matrix);
 
 	//Getters and setters
 	char getLetter() const;
@@ -51,6 +51,9 @@ public:
 	void setX(int x);
 	int getY() const;
 	void setY(int y);
+
+	void exportLetter(int data[]);
+	static Letter importLetter(const int data[], const int rows, const int cols);
 };
 
 #endif /* LETTER_H_ */

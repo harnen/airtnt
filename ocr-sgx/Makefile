@@ -76,9 +76,9 @@ endif
 SFML = -lsfml-graphics -lsfml-window -lsfml-system
 
 # App_Cpp_Files := App/App.cpp $(wildcard App/Edger8rSyntax/*.cpp) $(wildcard App/TrustedLibrary/*.cpp)
-App_Cpp_Files := App/App.cpp App/sgx_utils/sgx_utils.cpp lib/Letter.cpp lib/processing.cpp #lib/image_util.cpp
+App_Cpp_Files := App/App.cpp App/sgx_utils/sgx_utils.cpp lib/Letter.cpp lib/processing.cpp lib/image_util.cpp
 # App_Include_Paths := -IInclude -IApp -I$(SGX_SDK)/include
-App_Include_Paths := -IApp -I$(SGX_SDK)/include
+App_Include_Paths := -IApp -I$(SGX_SDK)/include -Ilib
 
 App_C_Flags := $(SGX_COMMON_CFLAGS) -fPIC -Wno-attributes $(App_Include_Paths)
 
@@ -95,7 +95,7 @@ else
 endif
 
 App_Cpp_Flags := $(App_C_Flags) -std=c++11
-App_Link_Flags := $(SGX_COMMON_CFLAGS) -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lpthread
+App_Link_Flags := $(SGX_COMMON_CFLAGS) -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lpthread $(SFML)
 
 ifneq ($(SGX_MODE), HW)
 	App_Link_Flags += -lsgx_uae_service_sim
@@ -179,7 +179,7 @@ App/Enclave_u.o: App/Enclave_u.c
 	@echo "CC   <=  $<"
 
 App/%.o: App/%.cpp
-	@$(CXX) $(App_Cpp_Flags) -c $< -o $@ $(SFML)
+	@$(CXX) $(App_Cpp_Flags) -c $< -o $@ 
 	@echo "CXX  <=  $<"
 
 $(App_Name): App/Enclave_u.o $(App_Cpp_Objects)

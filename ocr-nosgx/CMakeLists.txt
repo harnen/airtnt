@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.7)
-project(research_ocr)
+project(app)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -12,7 +12,7 @@ set(SOURCE_FILES
         src/processing.h
         src/processing.cpp)
 
-add_executable(research_ocr ${SOURCE_FILES})
+add_executable(app ${SOURCE_FILES})
 
 # Credit for the following to: https://github.com/SFML/SFML/wiki/Tutorial%3A-Build-your-SFML-project-with-CMake
 # Detect and add SFML
@@ -23,5 +23,5 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
 find_package(SFML 2 REQUIRED network audio graphics window system)
 if(SFML_FOUND)
     include_directories(${SFML_INCLUDE_DIR})
-    target_link_libraries(research_ocr ${EXECUTABLE_NAME} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
+    target_link_libraries(app ${EXECUTABLE_NAME} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
 endif()

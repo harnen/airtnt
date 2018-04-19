@@ -5,6 +5,14 @@
 #include "sgx_utils/sgx_utils.h"
 
 
+#include <vector>
+#include "Letter.h"
+#include "image_util.h"
+#include "processing.h"
+
+using namespace std;
+
+
 // Global EID shared by multiple threads
 sgx_enclave_id_t global_eid = 0;
 
@@ -21,6 +29,7 @@ void ocall_print(const char* str) {
  * Main entry point
  */
 int main(int argc, char const *argv[]) {
+
     
     /*****************************
      * init enclave
@@ -76,14 +85,77 @@ int main(int argc, char const *argv[]) {
     printf("%d + %d = %d\n", a, b, c);
 
 
+
     /*****************************
      * OCR
      ****************************/
+    char const *image_alphabet = "./data/image_alphabet.png";
+    char const *text_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    int const alphabet_length = 26;
+
+    
+    // creatre alphabet template
+    // Note: this is needed only once to generate the .sav files
+    /*
+    int ret = create_template(image_alphabet, text_alphabet, alphabet_length);
+    if (ret != 0) {
+        printf("Could not load alphabet image file: %s\n", image_alphabet);
+        return -1;
+    }
+    */
+
+    
+
+    // load alphabet template
+    // Note: this should be an OCALL from 'character_recognition'
+    vector<Letter> letters;
+    load_template(&letters, alphabet_length);
+
+    // load input
+    char const *image_input = "./data/input_2.png";
+    vector< vector<int> > pixels;
+    if (load_image(image_input, &pixels) != 0) {
+        printf("Could not load input image: %s\n", image_input);
+        return -1;
+    }
+    
+    // convert input to C type for ECALL
+    vector<int*> ptrs(pixels.size());
+    transform(begin(pixels), end(pixels), begin(ptrs), [](std::vector<int> &inner_vec) {
+        return inner_vec.data();
+    });
+    int **input =  ptrs.data();
+    int rows = pixels.size();
+    int cols = pixels[0].size();
+    
+
+
+    /********************** START ECALL **********************/
+    // perform OCR on input
+    char recognised_letters[100];
+    int length;
+    character_recognition(input, rows, cols, letters, recognised_letters, &length);
+
+    /*********************** END ECALL ***********************/
+
+
+    // print result
+    printf("OCR output: ");
+    for (int i = 0; i < length; i++) {
+        printf("%c", recognised_letters[i]);
+    }
+    printf("\n");
+
+
+    // free mem
+    pixels.clear();
+
 
 
     
     /*****************************
      * destroy enclave
      ****************************/
+    // Note: destroy enclave (TODO)
     return 0;
 }

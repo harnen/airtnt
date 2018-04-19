@@ -23,7 +23,7 @@ void character_recognition(int** input, int rows, int cols, const vector<Letter>
  * find_letters
  * find all letters in a 2d vector image.
  */
-vector<Letter> find_letters(const int& threshold, const vector< vector <int> > matrix);
+vector<Letter> find_letters(const int& threshold, const vector< vector<int> > matrix);
 
 /*
  * match_letter
