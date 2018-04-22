@@ -7,6 +7,12 @@
 #include <stdio.h>
 
 
+namespace std {
+	void __throw_length_error(char const*) {}
+	void __throw_bad_alloc() {}
+}
+
+
 // getters and setters
 char Letter::getLetter() const {
 	return letter;

@@ -41,6 +41,10 @@ else ifeq ($(findstring -m32, $(CXXFLAGS)), -m32)
 	SGX_ARCH := x86
 endif
 
+
+CFLAGS += -fPIC 
+CXXFLAGS += -fPIC
+
 ifeq ($(SGX_ARCH), x86)
 	SGX_COMMON_CFLAGS := -m32
 	SGX_LIBRARY_PATH := $(SGX_SDK)/lib
@@ -94,8 +98,8 @@ else
 		App_C_Flags += -DNDEBUG -UEDEBUG -UDEBUG
 endif
 
-App_Cpp_Flags := $(App_C_Flags) -std=c++11
-App_Link_Flags := $(SGX_COMMON_CFLAGS) -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lpthread $(SFML)
+App_Cpp_Flags := $(App_C_Flags) -std=c++11 -fPIC
+App_Link_Flags := $(SGX_COMMON_CFLAGS) -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lpthread $(SFML) -fPIC
 
 ifneq ($(SGX_MODE), HW)
 	App_Link_Flags += -lsgx_uae_service_sim
@@ -123,9 +127,9 @@ Enclave_Cpp_Files := Enclave/Enclave.cpp Enclave/Sealing/Sealing.cpp Enclave/OCR
 # Enclave_Include_Paths := -IInclude -IEnclave -I$(SGX_SDK)/include -I$(SGX_SDK)/include/tlibc -I$(SGX_SDK)/include/stlport
 Enclave_Include_Paths := -IEnclave -I$(SGX_SDK)/include -I$(SGX_SDK)/include/tlibc -I$(SGX_SDK)/include/stlport #-Ilib
 
-Enclave_C_Flags := $(SGX_COMMON_CFLAGS) -nostdinc -fvisibility=hidden -fpie -fstack-protector $(Enclave_Include_Paths)
-Enclave_Cpp_Flags := $(Enclave_C_Flags) -std=c++03 -nostdinc++
-Enclave_Link_Flags := $(SGX_COMMON_CFLAGS) -Wl,--no-undefined -nostdlib -nodefaultlibs -nostartfiles -L$(SGX_LIBRARY_PATH) \
+Enclave_C_Flags := $(SGX_COMMON_CFLAGS) -nostdinc -fvisibility=hidden -fpie -fstack-protector $(Enclave_Include_Paths) -fPIC
+Enclave_Cpp_Flags := $(Enclave_C_Flags) -std=c++03 -nostdinc++ -fPIC
+Enclave_Link_Flags := $(SGX_COMMON_CFLAGS) -fPIC -Wl,--no-undefined -nostdlib -nodefaultlibs -nostartfiles -L$(SGX_LIBRARY_PATH) \
 	-Wl,--whole-archive -l$(Trts_Library_Name) -Wl,--no-whole-archive \
 	-Wl,--start-group -lsgx_tstdc -lsgx_tstdcxx -l$(Crypto_Library_Name) -l$(Service_Library_Name) -Wl,--end-group \
 	-Wl,-Bstatic -Wl,-Bsymbolic -Wl,--no-undefined \
@@ -202,7 +206,7 @@ Enclave/%.o: Enclave/%.cpp
 	@echo "CXX  <=  $<"
 
 $(Enclave_Name): Enclave/Enclave_t.o $(Enclave_Cpp_Objects)
-	@$(CXX) $^ -o $@ $(Enclave_Link_Flags)
+	@$(CXX) $^ -o $@ $(Enclave_Link_Flags) 
 	@echo "LINK =>  $@"
 
 $(Signed_Enclave_Name): $(Enclave_Name)

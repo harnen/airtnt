@@ -13,7 +13,7 @@
 
 #include <string>
 
-using namespace std;
+//using namespace std;
 
 
 // Global EID shared by multiple threads
@@ -177,8 +177,6 @@ int main(int argc, char const *argv[]) {
     });
     int **letters_c =  letters_ptrs.data();
     int letters_rows = letters_vec.size();
-    int letters_cols = letters_vec[0].size(); // /!\ wrong -- size depend on each letter: (sizes[i][0]+sizes[i][1]+3) /!\
-
 
 
 
@@ -186,13 +184,13 @@ int main(int argc, char const *argv[]) {
     // perform OCR on input
     char recognised_letters[100]; // make array big enough
     int length;
-    character_recognition_wrap(global_eid, input, rows, cols, letters_c, letters_rows, letters_cols, recognised_letters, &length);
+    character_recognition_wrap(global_eid, input, rows, cols, letters_c, letters_rows, recognised_letters, &length);
 
     /*********************** END ECALL ***********************/
 
 
     // print result
-    printf("OCR output: ");
+    printf("\nOCR output: ");
     for (int i = 0; i < length; i++) {
         printf("%c", recognised_letters[i]);
     }

@@ -3,10 +3,128 @@
 #include "Enclave_t.h"
 
 
-#include "../lib/processing.h"
+#include "../../lib/processing.h"
 
 // test
 #include <string>
+#include "../../lib/Letter.h"
+
+
+
+class Letter2 {
+private:
+	/**
+	 * The char ascii value of the character represented by this letter class.  Defaults to * if
+	 * the character is unknown (for instance, in the case of unscanned letters)
+	 */
+	char letter;
+
+	/**
+	 * A matrix containing
+	 */
+	vector< vector<int> > matrix;
+
+	/**
+	 * The x and y coordinates in the parent matrix of where the matrix was found
+	 */
+	int x;
+	int y;
+
+public:
+	//Initialize a new letter from a matrix
+	Letter2(vector< vector<int> > matrix);
+
+	//Getters and setters
+	char getLetter() const;
+	void setLetter(char letter);
+	const vector<vector<int> >& getMatrix() const;
+	void setMatrix(const vector<vector<int> >& matrix);
+
+	int getX() const;
+	void setX(int x);
+	int getY() const;
+	void setY(int y);
+
+	void exportLetter(int data[]);
+	static Letter2 importLetter(const int data[], const int rows, const int cols);
+};
+
+// getters and setters
+char Letter2::getLetter() const {
+	return letter;
+}
+void Letter2::setLetter(char letter) {
+	this->letter = letter;
+}
+int Letter2::getX() const {
+	return x;
+}
+void Letter2::setX(int x) {
+	this->x = x;
+}
+int Letter2::getY() const {
+	return y;
+}
+void Letter2::setY(int y) {
+	this->y = y;
+}
+const vector< vector<int> >& Letter2::getMatrix() const {
+	return matrix;
+}
+void Letter2::setMatrix(const vector< vector<int> >& matrix) {
+	this->matrix = matrix;
+}
+
+// initialize a new letter object
+Letter2::Letter2(vector< vector<int> > matrix) {
+	this->matrix=matrix;
+	this->x=0;
+	this->y=0;
+	this->letter='*';
+}
+
+// import / export
+void Letter2::exportLetter(int data[]) {
+	// allocate array
+	//data[this->matrix.size() + this->matrix[0].size() + 3];
+
+	// export matrix
+	int rows = matrix.size();
+	int cols = matrix[0].size();
+	for (int i=0; i < rows; i++) {
+		for (int j=0; j < cols; j++) {
+			data[cols*i+j] = matrix[i][j];
+		}
+	}
+
+	// export x,y, char
+	data[matrix.size() * matrix[0].size() + 0] = x;
+	data[matrix.size() * matrix[0].size() + 1] = y;
+	data[matrix.size() * matrix[0].size() + 2] = (int) letter;
+}
+
+Letter2 Letter2::importLetter(const int data[], const int rows, const int cols) {
+	// set matrix
+	vector< vector<int> > new_matrix;
+	new_matrix.resize(rows, vector<int>(cols, 0));
+	for (int i=0; i < rows; i++) {
+		for (int j=0; j < cols; j++) {
+			new_matrix[i][j] = data[cols*i+j];
+		}
+	}
+	Letter2 letter(new_matrix);
+
+	// import x,y, char
+	letter.setX(data[rows * cols + 0]);
+	letter.setY(data[rows * cols + 1]);
+	letter.setLetter((char) data[rows * cols + 2]);
+
+	return letter;
+}
+
+
+
+
 
 
 /**
@@ -37,7 +155,7 @@ void test_function_3(const int *arr[], size_t rows, size_t cols) {
     }
 
 
-    ocall_print("End example function 3");
+    ocall_print("End example function 3\n\n");
 }
 
 
@@ -48,60 +166,39 @@ void detect_letter(vector thresholdInputPixels, int* out){
 */
 
 
-void character_recognition_wrap(int** input, int rows, int cols, int** letters_c, int letters_rows, int letters_cols, 
+void character_recognition_wrap(int** input, int rows, int cols, int** letters_c, int letters_rows, 
 	char *output_letters, int *length) {
 
 	
 	// convert input to vector
 	vector< vector<int> > input_image;
 	input_image.resize(rows, vector<int>(cols, 0));
-	for (int i=0; i < rows; ++i) {
-    	for (int j=0; j < cols; ++j) {
+	for (int i=0; i < rows; i++) {
+    	for (int j=0; j < cols; j++) {
         	input_image[i][j] = input[i][j];
         }
     }
     
     // convert letters C-type to object
-    //vector< vector<int> > letters_vec;
-	//letters_vec.resize(letters_rows, vector<int>(letters_cols, 0));
-	vector<Letter> letters;
-	for (int i=0; i < letters_rows; i++) {
-		int data[letters_cols];
-    	for (int j=0; j < letters_cols; j++) {
-    		data[j] = letters_c[i][j];
+    vector<Letter2> letters;
+	for (int i = 0; i < letters_rows; i++) {
 
-    		// import letter
-    		Letter tmp = Letter::importLetter(data, sizes[i][0], sizes[i][1]);
-    		// add letter to vector
-    		//letters.push_back(tmp);
-        	//letters_vec[i][j] = letters_c[i][j];
+		int letters_cols = sizes[i][0] * sizes[i][1] + 3;
+		int data[letters_cols];
+    	for (int j = 0; j < letters_cols; j++) {
+        	data[j] = letters_c[i][j];
         }
+        Letter2 letter = Letter2::importLetter(data,sizes[i][0], sizes[i][1]);
+        letters.push_back(letter);
+
+        // test
+        ocall_print_int(letter.getLetter());
     }
 
-    /*
-    vector<Letter> letters;
-    for(int i=0; i<letters_rows; i++) {
-		// import letter i
-		int *data = letters_vec[i].data();
-		Letter tmp = Letter::importLetter(data, sizes[i][0], sizes[i][1]);
-		letters.push_back(tmp);
-	}
-	*/
-
-	/*
-	// find letters in image
+    // find letters in image
 	vector<Letter> possible_letters = find_letters(127, input_image);
 
-	// set number of recognised letters
-	*length = possible_letters.size();
-
-	// find the best match in the alphabet for each letter
-	for (int i = 0; i < possible_letters.size(); i++) {
-		Letter match = letters.at(0); 
-		match_letter(possible_letters.at(i), letters, &match);
-		output_letters[i] = match.getLetter();
-	}
-	*/
+	
 
 
 }
