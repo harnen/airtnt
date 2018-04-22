@@ -169,8 +169,9 @@ void detect_letter(vector thresholdInputPixels, int* out){
 void character_recognition_wrap(int** input, int rows, int cols, int** letters_c, int letters_rows, 
 	char *output_letters, int *length) {
 
-	
+	//////////////////////////////////////////
 	// convert input to vector
+	//////////////////////////////////////////
 	vector< vector<int> > input_image;
 	input_image.resize(rows, vector<int>(cols, 0));
 	for (int i=0; i < rows; i++) {
@@ -179,7 +180,10 @@ void character_recognition_wrap(int** input, int rows, int cols, int** letters_c
         }
     }
     
+
+    //////////////////////////////////////////
     // convert letters C-type to object
+    //////////////////////////////////////////
     vector<Letter2> letters;
 	for (int i = 0; i < letters_rows; i++) {
 
@@ -188,15 +192,82 @@ void character_recognition_wrap(int** input, int rows, int cols, int** letters_c
     	for (int j = 0; j < letters_cols; j++) {
         	data[j] = letters_c[i][j];
         }
-        Letter2 letter = Letter2::importLetter(data,sizes[i][0], sizes[i][1]);
-        letters.push_back(letter);
+        Letter2 retrieved_letter = Letter2::importLetter(data,sizes[i][0], sizes[i][1]);
+        letters.push_back(retrieved_letter);
 
-        // test
-        ocall_print_int(letter.getLetter());
+        // test: debug
+        ocall_print_int(retrieved_letter.getLetter());
     }
 
+
+    //////////////////////////////////////////
     // find letters in image
-	vector<Letter> possible_letters = find_letters(127, input_image);
+    //////////////////////////////////////////
+    int threshold = 127;
+    vector<Letter2> possible_letters;
+	// initialize impossible base values
+	int leftEdge = -1;
+	int topEdge = -1;
+	int bottomEdge = -1;
+
+	for (unsigned int x = 0; x < input_image.size(); x++) {
+		// determin whether a pixel was found in this column
+		bool found = false;
+
+		for (unsigned int y = 0; y < input_image.at(0).size(); y++) {
+			// look for the top and bottom edges of the shape
+			if (input_image.at(x).at(y) < threshold) {
+				if (topEdge < 0 || y < topEdge) {topEdge = y;}
+				found = true;
+			} 
+			else {
+				if (y>0&&input_image.at(x).at(y-1)<threshold&&(bottomEdge < 0 || y > bottomEdge)) {
+					bottomEdge = y;
+				}
+			}
+		}
+
+		
+		// look for the left edge
+		if (found) {
+			if (leftEdge < 0) {leftEdge = x;}
+		} 
+		else {
+			if (leftEdge > 0) {
+				// we've found the right edge, so we found a shape
+				vector< vector<int> > subMatrix;
+				//int mat[x-leftEdge][bottomEdge-topEdge];
+
+				// copy the shape to a new input_image
+				for (int subx = leftEdge; subx < x; subx++) {
+					vector<int> column;
+					for (int suby = topEdge; suby < bottomEdge; suby++) {
+						column.push_back(input_image.at(subx).at(suby));
+						//mat[subx-leftEdge][subx-topEdge] = input_image.at(subx).at(suby);
+						
+					}
+					subMatrix.push_back(column);
+				}
+
+				//mat[x-1-leftEdge][bottomEdge-1-topEdge] = input_image.at(x-1).at(bottomEdge-1);
+				ocall_print("HERE");
+				/*
+				// initialize a letter of the input_image
+				Letter2 letter(subMatrix);
+				letter.setX(leftEdge);
+				letter.setY(topEdge);
+				possible_letters.push_back(letter);
+
+				// set values back to original state to search for more shapes
+				leftEdge = -1;
+				topEdge = -1;
+				bottomEdge = -1;
+				*/
+			}
+		}
+	}
+
+
 
 	
 

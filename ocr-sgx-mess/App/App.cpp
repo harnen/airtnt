@@ -154,6 +154,11 @@ int main(int argc, char const *argv[]) {
     int **input =  ptrs.data();
     int rows = pixels.size();
     int cols = pixels[0].size();
+
+
+    //for (int i = 0; i < rows; i++) {printf("%d\n", input[i][0]);}
+
+
     
     // convert alphabet letters to C type for ECALL
     vector< vector<int> > letters_vec;
