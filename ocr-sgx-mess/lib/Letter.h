@@ -10,6 +10,7 @@
 
 using namespace std;
 
+
 /**
  * The Letter class represents a matrix that is an image of a letter.
  * It store the location where it was found and the matrix of the letter

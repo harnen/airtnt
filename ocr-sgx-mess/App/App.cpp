@@ -13,7 +13,7 @@
 
 #include <string>
 
-using namespace std;
+//using namespace std;
 
 
 // Global EID shared by multiple threads
@@ -28,6 +28,9 @@ void ocall_print(const char* str) {
 }
 void ocall_print_int(int data) {
     printf("%d\n", data);
+}
+void ocall_print_char(int data) {
+    printf("%c\n", data);
 }
 
 
@@ -139,7 +142,7 @@ int main(int argc, char const *argv[]) {
     load_template(&letters, alphabet_length);
 
     // load input
-    char const *image_input = "./data/input_2.png";
+    char const *image_input = "./data/input_4.png";
     vector< vector<int> > pixels;
     if (load_image(image_input, &pixels) != 0) {
         printf("Could not load input image: %s\n", image_input);
@@ -154,6 +157,11 @@ int main(int argc, char const *argv[]) {
     int **input =  ptrs.data();
     int rows = pixels.size();
     int cols = pixels[0].size();
+
+
+    //for (int i = 0; i < rows; i++) {printf("%d\n", input[i][0]);}
+
+
     
     // convert alphabet letters to C type for ECALL
     vector< vector<int> > letters_vec;
@@ -177,8 +185,6 @@ int main(int argc, char const *argv[]) {
     });
     int **letters_c =  letters_ptrs.data();
     int letters_rows = letters_vec.size();
-    int letters_cols = letters_vec[0].size(); // /!\ wrong -- size depend on each letter: (sizes[i][0]+sizes[i][1]+3) /!\
-
 
 
 
@@ -186,13 +192,13 @@ int main(int argc, char const *argv[]) {
     // perform OCR on input
     char recognised_letters[100]; // make array big enough
     int length;
-    character_recognition_wrap(global_eid, input, rows, cols, letters_c, letters_rows, letters_cols, recognised_letters, &length);
+    character_recognition_wrap(global_eid, input, rows, cols, letters_c, letters_rows, recognised_letters, &length);
 
     /*********************** END ECALL ***********************/
 
 
     // print result
-    printf("OCR output: ");
+    printf("\nOCR output: ");
     for (int i = 0; i < length; i++) {
         printf("%c", recognised_letters[i]);
     }
