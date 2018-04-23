@@ -37,10 +37,19 @@
 #include "remote_attestation_result.h"
 #include "ias_ra.h"
 #include "network_ra.h"
+#include "../isv_app/crypto.h"
 
 #ifdef  __cplusplus
 extern "C" {
 #endif
+
+typedef struct life_input
+{
+    uint8_t size;
+    uint8_t steps;
+    char array[]; 
+} life_input_t;
+
 
 typedef enum {
     SP_OK,
@@ -133,7 +142,8 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
 int sp_ra_free_msg2(
     sample_ra_msg2_t *p_msg2);
 
-
+int sp_ra_proc_msg_output_req(const life_input_t *p_output, 
+                                uint32_t output_size);
 
 typedef int (*sample_enroll)(int sp_credentials, sample_spid_t* spid,
     int* authentication_token);
@@ -154,12 +164,8 @@ typedef struct sample_extended_epid_group
     sample_verify_attestation_evidence verify_attestation_evidence;
 } sample_extended_epid_group;
 
-typedef struct life_input
-{
-    uint8_t size;
-    uint8_t steps;
-    char array[]; 
-} life_input_t;
+
+
 
 #ifdef  __cplusplus
 }

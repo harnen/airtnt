@@ -417,10 +417,28 @@ sgx_status_t put_secret_data(
         uint8_t result_iv[12] = {0};
         uint8_t buf[secret_size];
 
-        for(int i = 0; i < secret_size; i++){
-            buf[i] = secret_size;
+        for(int i = 0; i < SGX_AESGCM_KEY_SIZE; i++){
+            (*result_key)[i] = i;
         }
+        //encrypt with a random key
         sgx_rijndael128GCM_encrypt(result_key,
+                                    (uint8_t*) input, //
+                                    secret_size, //output is the same size as the input
+                                    buf,
+                                    &result_iv[0],
+                                    12,          //recommended value
+                                    NULL,
+                                    0,
+                                    out_mac);
+                              
+        sgx_aes_gcm_128bit_key_t shared_key;
+        for(int i = 0; i < SGX_AESGCM_KEY_SIZE; i++){
+            shared_key[i] = 10;
+        }
+        
+    
+        //encrypt with the original key derived from remote attestation  
+        sgx_rijndael128GCM_encrypt(&sk_key, //&shared_key,
                                     buf, //(const uint8_t*) input,
                                     secret_size, //output is the same size as the input
                                     result,
@@ -429,8 +447,6 @@ sgx_status_t put_secret_data(
                                     NULL,
                                     0,
                                     out_mac);
-                                    
-        int tmp =0;
 
     } while(0);
     return ret;
