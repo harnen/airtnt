@@ -29,6 +29,9 @@ void ocall_print(const char* str) {
 void ocall_print_int(int data) {
     printf("%d\n", data);
 }
+void ocall_print_char(int data) {
+    printf("%c\n", data);
+}
 
 
 /* 
@@ -139,7 +142,7 @@ int main(int argc, char const *argv[]) {
     load_template(&letters, alphabet_length);
 
     // load input
-    char const *image_input = "./data/input_2.png";
+    char const *image_input = "./data/input_4.png";
     vector< vector<int> > pixels;
     if (load_image(image_input, &pixels) != 0) {
         printf("Could not load input image: %s\n", image_input);
