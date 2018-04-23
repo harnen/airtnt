@@ -221,13 +221,12 @@ void character_recognition_wrap(int** input, int rows, int cols, int** letters_c
 				found = true;
 			} 
 			else {
-				if (y>0&&input_image.at(x).at(y-1)<threshold&&(bottomEdge < 0 || y > bottomEdge)) {
+				if (y>0 && input_image.at(x).at(y-1) < threshold && (bottomEdge<0 || y>bottomEdge)) {
 					bottomEdge = y;
 				}
 			}
 		}
 
-		
 		// look for the left edge
 		if (found) {
 			if (leftEdge < 0) {leftEdge = x;}
@@ -250,7 +249,7 @@ void character_recognition_wrap(int** input, int rows, int cols, int** letters_c
 				}
 
 				//mat[x-1-leftEdge][bottomEdge-1-topEdge] = input_image.at(x-1).at(bottomEdge-1);
-				ocall_print("HERE");
+				ocall_print_int(x);
 				/*
 				// initialize a letter of the input_image
 				Letter2 letter(subMatrix);
