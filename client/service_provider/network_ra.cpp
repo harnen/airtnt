@@ -39,7 +39,7 @@
 
 #include <boost/asio.hpp>
 #include <iostream>
-
+#include "chat_message.hpp"
 
 // Used to send requests to the service provider sample.  It
 // simulates network communication between the ISV app and the
@@ -82,7 +82,7 @@ int ra_network_send_receive(const char *server_url,
 {
     int ret = 0;
     ra_samp_response_header_t* p_resp_msg;
-    
+    chat_message msg;    
     if((NULL == server_url) ||
         (NULL == p_req) ||
         (NULL == p_resp))
@@ -94,40 +94,47 @@ int ra_network_send_receive(const char *server_url,
         int result = connect("localhost", "8000");
         if(result) return -1;
     }
-
+    printf("Connected to the server\n");
     
 
     int wrote = 0;
     int read = 0;
-    switch(p_req->type)
+    wrote = boost::asio::write(s, 
+                               boost::asio::buffer(p_req, 
+                               p_req->size + sizeof (ra_samp_request_header_t)));
+    printf("Wrote %d bytes of Msg %d\n", wrote, p_req->type);
+    if (wrote != (p_req->size + sizeof (ra_samp_request_header_t)))
     {
-
-    case TYPE_RA_MSG0:
-        wrote = boost::asio::write(s, boost::asio::buffer(((uint8_t*)p_req
-            + sizeof(ra_samp_request_header_t)),
-            p_req->size));
-        /*ret = sp_ra_proc_msg0_req((const sample_ra_msg0_t*)((uint8_t*)p_req
-            + sizeof(ra_samp_request_header_t)),
-            p_req->size);*/
-        if (wrote != p_req->size)
-        {
-            fprintf(stderr, "\nError, call sp_ra_proc_msg1_req fail [%s].",
+        fprintf(stderr, "\nError, sending the message [%s].",
                 __FUNCTION__);
-            ret = -1;
-        }
-        break;
+        ret = -1;
+    }else{
+        printf("Msg %d success\n", p_req->type);
+    }
 
-    case TYPE_RA_MSG1:
-        wrote = boost::asio::write(s, boost::asio::buffer(((uint8_t*)p_req
+    read = boost::asio::read(s,
+                             boost::asio::buffer(reply, sizeof(ra_samp_response_header_t)));
+    ra_samp_response_header_t* reply_header = (ra_samp_response_header_t*) reply;
+    printf("Received a header, size: %d, type: %d\n", reply_header->size, reply_header->type);
+
+    if(reply_header->size > 0){
+        printf("Reading the rest of the message\n");
+        read = boost::asio::read(s,
+                                 boost::asio::buffer(reply + sizeof(ra_samp_response_header_t), reply_header->size)); 
+    }else{
+        printf("Nothing else to read\n");
+    }
+    *p_resp = (ra_samp_response_header_t*) reply;
+
+/*    case TYPE_RA_MSG1:
+        wrote = boost::asio::write(s,
+                boost::asio::buffer(p_req
             + sizeof(ra_samp_request_header_t)),
             p_req->size));
-        /*ret = sp_ra_proc_msg1_req((const sample_ra_msg1_t*)((uint8_t*)p_req
+        ret = sp_ra_proc_msg1_req((const sample_ra_msg1_t*)((uint8_t*)p_req
             + sizeof(ra_samp_request_header_t)),
             p_req->size,
-            &p_resp_msg);*/
-        read = boost::asio::read(s,
-        //TODO Get the actual size
-            boost::asio::buffer(reply, 1)); 
+            &p_resp_msg);
         if((wrote != p_req->size) || (read != 1))
         {
             fprintf(stderr, "\nError, call sp_ra_proc_msg1_req fail [%s].",
@@ -146,10 +153,10 @@ int ra_network_send_receive(const char *server_url,
             sizeof(ra_samp_request_header_t)),
             p_req->size));
 
-        /*ret =sp_ra_proc_msg3_req((const sample_ra_msg3_t*)((uint8_t*)p_req +
+        ret =sp_ra_proc_msg3_req((const sample_ra_msg3_t*)((uint8_t*)p_req +
             sizeof(ra_samp_request_header_t)),
             p_req->size,
-            &p_resp_msg);*/
+            &p_resp_msg);
         read = boost::asio::read(s,
         //TODO Get the actual size
             boost::asio::buffer(reply, 1)); 
@@ -171,9 +178,9 @@ int ra_network_send_receive(const char *server_url,
             sizeof(ra_samp_request_header_t)),
             p_req->size));
 
-/*        ret = sp_ra_proc_msg_output_req((const life_input_t*) ((uint8_t*)p_req + 
+        ret = sp_ra_proc_msg_output_req((const life_input_t*) ((uint8_t*)p_req + 
                                 sizeof(ra_samp_request_header_t)),
-                                p_req->size);*/
+                                p_req->size);
         break;
 
     default:
@@ -182,7 +189,7 @@ int ra_network_send_receive(const char *server_url,
             p_req->type, __FUNCTION__);
         break;
     }
-
+*/
     return ret;
 }
 
