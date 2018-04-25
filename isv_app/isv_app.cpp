@@ -47,7 +47,7 @@
 
 // Needed to get service provider's information, in your real project, you will
 // need to talk to real server.
-#include "network_ra.h"
+#include "network.h"
 
 // Needed to create enclave and do ecall.
 #include "sgx_urts.h"
@@ -66,7 +66,9 @@
 // messages and the information flow.
 #include "sample_messages.h"
 
-
+#include "sgx_tcrypto.h"
+#include "sample_libcrypto.h" 
+#include "crypto.h"
 #define ENCLAVE_PATH "isv_enclave.signed.so"
 
 uint8_t* msg1_samples[] = { msg1_sample1, msg1_sample2 };
@@ -664,12 +666,130 @@ int main(int argc, char* argv[])
 
             printf("Received msg size: %d\n", p_att_result_msg_body->secret.payload_size);
 
+            int result_size;
+            uint8_t* result = (uint8_t*) malloc(p_att_result_msg_body->secret.payload_size);
+            sgx_aes_gcm_128bit_key_t result_key;
+            for(int i =  0; i < SGX_AESGCM_KEY_SIZE; i++){
+                result_key[i] = i;
+            }
+
+            sgx_aes_gcm_128bit_tag_t out_mac;
+ /*           for(int i =  0; i < SGX_AESGCM_MAC_SIZE; i++){
+                out_mac[i] = i;
+            }
+            printf("Orig mac:");
+            for(int i =  0; i < SGX_AESGCM_MAC_SIZE; i++){
+              printf("%d,", out_mac[i]);
+            }
+            printf("\n");
+
+
+            printf("Orig key:");
+            for(int i =  0; i < SGX_AESGCM_KEY_SIZE; i++){
+              printf("%d,", result_key[i]);
+            }
+            printf("\n");*/
+
             ret = put_secret_data(enclave_id,
                                   &status,
                                   context,
                                   p_att_result_msg_body->secret.payload,
                                   p_att_result_msg_body->secret.payload_size,
-                                  p_att_result_msg_body->secret.payload_tag);
+                                  p_att_result_msg_body->secret.payload_tag,
+                                  result,
+                                  &result_size,
+                                  &result_key,
+                                  &out_mac);
+
+/*            printf("Got result size: %d\n", result_size); 
+            printf("Got key:");
+            for(int i =  0; i < SGX_AESGCM_KEY_SIZE; i++){
+              printf("%d,", result_key[i]);
+            }
+            printf("\n");
+
+            printf("Got mac:");
+            for(int i =  0; i < SGX_AESGCM_MAC_SIZE; i++){
+              printf("%d,", out_mac[i]);
+            }
+            printf("\n");
+            //initialization vector - we keep it everywhere the same for now
+            uint8_t result_iv[12] = {0};
+            sgx_aes_gcm_128bit_key_t* result_key_ = (sgx_aes_gcm_128bit_key_t*) &result_key;
+
+            uint8_t decrypted[p_att_result_msg_body->secret.payload_size];
+            uint8_t decrypted2[p_att_result_msg_body->secret.payload_size];
+
+
+            sgx_aes_gcm_128bit_key_t random_key;
+            for(int i = 0; i < SGX_AESGCM_KEY_SIZE; i++){
+                random_key[i] = i;
+            }
+
+            sgx_aes_gcm_128bit_key_t shared_key;
+            
+            for(int i = 0; i < SGX_AESGCM_KEY_SIZE; i++){
+                shared_key[i] = 10;
+            }
+
+            int dec_enc_status = decrypt(random_key,
+                                         result,
+                                         p_att_result_msg_body->secret.payload_size, //output is the same size as intput
+                                         decrypted,
+                                         &result_iv[0],
+                                         12,
+                                         NULL,
+                                         0,
+                                         NULL);
+            
+
+            dec_enc_status = decrypt(shared_key,
+                                         decrypted,
+                                         p_att_result_msg_body->secret.payload_size, //output is the same size as intput
+                                         decrypted2,
+                                         &result_iv[0],
+                                         12,
+                                         NULL,
+                                         0,
+                                         NULL);
+
+            printf("Decrypted buffer from the enclave:");
+            for(int i = 0; i < p_att_result_msg_body->secret.payload_size; i++){
+                printf("%d,", decrypted2[i]);
+            } 
+            printf("\n");
+            
+            if(dec_enc_status > -1){
+                printf("Enclave Decryption Successful\n");
+            }else{
+                printf("Enclave Decryption Failed\n");
+            }*/
+
+            //send back the result
+            uint32_t output_size = p_att_result_msg_body->secret.payload_size; //we assume that input is the same as output
+
+            ra_samp_request_header_t* p_msg_result = (ra_samp_request_header_t*)
+                malloc(sizeof(ra_samp_request_header_t)
+                +output_size);
+            if (NULL == p_msg_result)
+            {
+                ret = -1;
+                goto CLEANUP;
+            }
+            p_msg_result->type = TYPE_RA_OUTPUT;
+            p_msg_result->size = output_size;
+
+            memcpy((uint8_t*)p_msg_result + sizeof(ra_samp_request_header_t), result, output_size);
+
+            ra_samp_response_header_t* p_msg_reply = (ra_samp_response_header_t*)  malloc(1);
+            ret = ra_network_send_receive("http://SampleServiceProvider.intel.com/",
+                                      p_msg_result,
+                                      &p_msg_reply); //TODO: Change it - for now, we don't assume any response
+
+            free(result);
+            free (p_msg_reply);
+
+ 
             if((SGX_SUCCESS != ret)  || (SGX_SUCCESS != status))
             {
                 fprintf(OUTPUT, "\nError, attestation result message secret "

@@ -125,6 +125,9 @@ SAMPLE_LIBCRYPTO_API sample_status_t sample_rijndael128GCM_encrypt(const sample_
                                         uint8_t *p_dst, const uint8_t *p_iv, uint32_t iv_len, const uint8_t *p_aad, uint32_t aad_len,
                                         sample_aes_gcm_128bit_tag_t *p_out_mac);
 
+SAMPLE_LIBCRYPTO_API sample_status_t sample_rijndael128GCM_decrypt(const sample_aes_gcm_128bit_key_t *p_key, const uint8_t *p_src, uint32_t src_len,
+                                        uint8_t *p_dst, const uint8_t *p_iv, uint32_t iv_len, const uint8_t *p_aad, uint32_t aad_len,
+                                        sample_aes_gcm_128bit_tag_t *p_out_mac);
 /* Message Authentication - Rijndael 128 CMAC
 * Parameters:
 *   Return: sample_status_t  - SAMPLE_SUCCESS on success, error code otherwise.

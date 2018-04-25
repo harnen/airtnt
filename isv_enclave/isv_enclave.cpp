@@ -68,7 +68,7 @@ static const sgx_ec256_public_t g_sp_pub_key = {
 // Used to store the secret passed by the SP in the sample code. The
 // size is forced to be 8 bytes. Expected value is
 // 0x01,0x02,0x03,0x04,0x0x5,0x0x6,0x0x7
-uint8_t g_secret[18] = {0};
+//uint8_t g_secret[18] = {0};
 
 
 #ifdef SUPPLIED_KEY_DERIVATION
@@ -361,17 +361,22 @@ sgx_status_t put_secret_data(
     sgx_ra_context_t context,
     uint8_t *p_secret,
     uint32_t secret_size,
-    uint8_t *p_gcm_mac)
+    uint8_t *p_gcm_mac,
+    uint8_t* result,
+    int* result_size,
+    sgx_aes_gcm_128bit_key_t* result_key,
+    sgx_aes_gcm_128bit_tag_t* out_mac)
 {
     sgx_status_t ret = SGX_SUCCESS;
     sgx_ec_key_128bit_t sk_key;
 
     do {
-        /*if(secret_size != 8)
-        {
-            ret = SGX_ERROR_INVALID_PARAMETER;
-            break;
-        }*/
+
+        /*
+         *  Decrypt the input
+         */
+        //allocate space for the decrypted input
+        uint8_t* g_secret = (uint8_t*) malloc(secret_size);
 
         ret = sgx_ra_get_keys(context, SGX_RA_KEY_SK, &sk_key);
         if(SGX_SUCCESS != ret)
@@ -391,16 +396,58 @@ sgx_status_t put_secret_data(
                                          (const sgx_aes_gcm_128bit_tag_t *)
                                             (p_gcm_mac));
 
-       
+        /*
+         * Perform the requested computations
+         */
+
         life_input_t* input = (life_input_t*) g_secret;
         int size = input->size;
         int steps = input->steps;
         simulate(input->size, input->steps, input->array);
 
-        // Once the server has the shared secret, it should be sealed to
-        // persistent storage for future use. This will prevents having to
-        // perform remote attestation until the secret goes stale. Once the
-        // enclave is created again, the secret can be unsealed.
+        /*
+         * Encrypt the computed results
+         */
+        *result_size = sizeof(sgx_aes_gcm_128bit_key_t);
+       
+        //generate a random encryption key
+        sgx_read_rand((unsigned char*) result_key, sizeof(*result_key)); 
+
+        //initialization vector - we keep it everywhere the same for now
+        uint8_t result_iv[12] = {0};
+        uint8_t buf[secret_size];
+
+        for(int i = 0; i < SGX_AESGCM_KEY_SIZE; i++){
+            (*result_key)[i] = i;
+        }
+        //encrypt with a random key
+        sgx_rijndael128GCM_encrypt(result_key,
+                                    (uint8_t*) input, //
+                                    secret_size, //output is the same size as the input
+                                    buf,
+                                    &result_iv[0],
+                                    12,          //recommended value
+                                    NULL,
+                                    0,
+                                    out_mac);
+                              
+        sgx_aes_gcm_128bit_key_t shared_key;
+        for(int i = 0; i < SGX_AESGCM_KEY_SIZE; i++){
+            shared_key[i] = 10;
+        }
+        
+    
+        //encrypt with the original key derived from remote attestation  
+        sgx_rijndael128GCM_encrypt(&sk_key, //&shared_key,
+                                    buf, //(const uint8_t*) input,
+                                    secret_size, //output is the same size as the input
+                                    result,
+                                    &result_iv[0],
+                                    12,          //recommended value
+                                    NULL,
+                                    0,
+                                    out_mac);
+
     } while(0);
     return ret;
 }

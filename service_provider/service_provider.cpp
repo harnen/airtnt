@@ -755,3 +755,55 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
     return ret;
 }
 
+int sp_ra_proc_msg_output_req(const life_input_t *p_output,
+                                uint32_t output_size){
+
+    uint8_t iv[12] = {0};
+    printf("Got output size: %d\n", output_size); 
+    uint8_t buf[output_size];
+
+    sample_ec_key_128bit_t random_key;
+    for(int i = 0; i < 16; i++){
+        random_key[i] = i;
+    }
+
+    sample_ec_key_128bit_t shared_key;
+
+    for(int i = 0; i < 16; i++){
+        shared_key[i] = 10;
+    }
+
+
+    //decrypt with the shared key
+    int ret = decrypt(g_sp_db.sk_key,
+                        (uint8_t*) p_output,
+                        output_size,
+                        buf,
+                        &iv[0],
+                        12,
+                        NULL,
+                        0,
+                        NULL);
+
+
+    uint8_t decrypted[output_size];
+    ret = decrypt(random_key,
+                        (uint8_t*) buf,
+                        output_size,
+                        decrypted,
+                        &iv[0],
+                        12,
+                        NULL,
+                        0,
+                        NULL);
+   
+    printf("Decrypted on service provider: ");
+    for(int i = 0; i < 16; i++){
+        printf("%d,", decrypted[i]);
+    }
+    printf("\n");
+
+
+    return 0;
+}
+
