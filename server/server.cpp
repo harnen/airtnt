@@ -98,9 +98,6 @@ void session(tcp::socket sock)
       printf("Response type: %d\n", p_msg0_resp_full->type);
 
 
-      // free mem
-      ra_free_network_response_buffer(p_msg0_resp_full);
-      //SAFE_FREE(p_msg0_full);
       ////////////////////////////////
       // END EDIT
       ////////////////////////////////
