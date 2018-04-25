@@ -42,7 +42,7 @@ void session(tcp::socket sock)
       char data[max_length];
 
       boost::system::error_code error;
-      size_t length = sock.read_some(boost::asio::buffer(read_msg_.data(), chat_message::header_length), error);
+      size_t length = sock.read_some(boost::asio::buffer(data, sizeof(ra_samp_request_header_t)), error);
       if (error == boost::asio::error::eof){
         std::cout << "Connection close by peer\n";
         break; // Connection closed cleanly by peer.
@@ -50,11 +50,17 @@ void session(tcp::socket sock)
         throw boost::system::system_error(error); // Some other error.
       }
 
+      /*
       if( !read_msg_.decode_header()){
         std::cout << "Error reading header\n";
         break;
       }
-      sock.read_some(boost::asio::buffer(read_msg_.body(), read_msg_.body_length()), error);
+      */
+      ra_samp_request_header_t *header = data;
+      printf("%d\n", header->size);
+      printf("%d\n", header->type);
+
+      sock.read_some(boost::asio::buffer(data+sizeof(*header), header->size, error);
       if (error == boost::asio::error::eof)
         break; // Connection closed cleanly by peer.
       else if (error)
@@ -66,6 +72,7 @@ void session(tcp::socket sock)
       // EDIT
       ////////////////////////////////
       // set message
+      /*
       ra_samp_request_header_t *p_msg0_full = NULL;
       p_msg0_full = (ra_samp_request_header_t*)
         malloc(sizeof(ra_samp_request_header_t) + sizeof(uint32_t));
@@ -76,17 +83,21 @@ void session(tcp::socket sock)
 
       // et buffer
       ra_samp_response_header_t *p_msg0_resp_full = NULL;
+      */
+
+      ra_samp_response_header_t *p_msg0_resp_full = NULL;
 
       // receive message
       ra_network_send_receive(
         "http://example.com",
-        p_msg0_full,
+        data,
         &p_msg0_resp_full
       );
 
+
       // free mem
       ra_free_network_response_buffer(p_msg0_resp_full);
-      SAFE_FREE(p_msg0_full);
+      //SAFE_FREE(p_msg0_full);
       ////////////////////////////////
       // END EDIT
       ////////////////////////////////
