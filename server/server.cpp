@@ -105,7 +105,10 @@ void session(tcp::socket sock)
 
 
       // wirte to dump to socket
-      boost::asio::write(sock, boost::asio::buffer(read_msg_.body(), read_msg_.body_length()));
+      boost::asio::write(sock, boost::asio::buffer(
+        p_msg0_resp_full, 
+        sizeof(ra_samp_response_header_t) + p_msg0_resp_full->size)
+      );
 
 
 
