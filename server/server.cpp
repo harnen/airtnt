@@ -60,7 +60,7 @@ void session(tcp::socket sock)
       printf("%d\n", header->size);
       printf("%d\n", header->type);
 
-      sock.read_some(boost::asio::buffer(data+sizeof(*header), header->size, error);
+      sock.read_some(boost::asio::buffer(data+sizeof(*header), header->size, error));
       if (error == boost::asio::error::eof)
         break; // Connection closed cleanly by peer.
       else if (error)
