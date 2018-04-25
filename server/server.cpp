@@ -90,7 +90,7 @@ void session(tcp::socket sock)
       // receive message
       ra_network_send_receive(
         "http://example.com",
-        data,
+        (ra_samp_request_header_t*) data,
         &p_msg0_resp_full
       );
 
