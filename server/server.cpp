@@ -106,6 +106,17 @@ void session(tcp::socket sock)
 
       // wirte to dump to socket
       boost::asio::write(sock, boost::asio::buffer(read_msg_.body(), read_msg_.body_length()));
+
+
+
+      ////////////////////////////////
+      // EDIT
+      ////////////////////////////////
+      // free mem
+      ra_free_network_response_buffer(p_msg0_resp_full);
+      ////////////////////////////////
+      // END EDIT
+      ////////////////////////////////
     }
   }
   catch (std::exception& e)
