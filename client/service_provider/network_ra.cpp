@@ -52,7 +52,7 @@
 
 // @return int
 
-#define MAX_BUF_SIZE 1024
+#define MAX_BUF_SIZE 2048
 
 using boost::asio::ip::tcp;
 boost::asio::io_context io_context;
@@ -114,6 +114,7 @@ int ra_network_send_receive(const char *server_url,
 
     read = boost::asio::read(s,
                              boost::asio::buffer(reply, sizeof(ra_samp_response_header_t)));
+    printf("Read %d bytes \n", read);
     ra_samp_response_header_t* reply_header = (ra_samp_response_header_t*) reply;
     printf("Received a header, size: %d, type: %d\n", reply_header->size, reply_header->type);
 
@@ -121,10 +122,10 @@ int ra_network_send_receive(const char *server_url,
         printf("Reading the rest of the message\n");
         read = boost::asio::read(s,
                                  boost::asio::buffer(reply + sizeof(ra_samp_response_header_t), reply_header->size)); 
+        *p_resp = (ra_samp_response_header_t*) reply;
     }else{
         printf("Nothing else to read\n");
     }
-    *p_resp = (ra_samp_response_header_t*) reply;
 
 /*    case TYPE_RA_MSG1:
         wrote = boost::asio::write(s,
@@ -201,8 +202,8 @@ int ra_network_send_receive(const char *server_url,
 
 void ra_free_network_response_buffer(ra_samp_response_header_t *resp)
 {
-    if(resp!=NULL)
+    /*if(resp!=NULL)
     {
         free(reply);
-    }
+    }*/
 }

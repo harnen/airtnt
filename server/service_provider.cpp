@@ -618,7 +618,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
         memset(p_att_result_msg_full, 0, att_result_msg_size
                + sizeof(ra_samp_response_header_t) + msg_size);
         p_att_result_msg_full->type = TYPE_RA_ATT_RESULT;
-        p_att_result_msg_full->size = att_result_msg_size;
+        p_att_result_msg_full->size = att_result_msg_size + msg_size;
         if(IAS_QUOTE_OK != attestation_report.status)
         {
             p_att_result_msg_full->status[0] = 0xFF;

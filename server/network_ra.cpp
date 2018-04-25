@@ -113,7 +113,6 @@ int ra_network_send_receive(const char *server_url,
             p_req->size,
             &p_resp_msg);
 
-        p_resp_msg->size += 18;
          
         if(0 != ret)
         {
