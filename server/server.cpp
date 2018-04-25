@@ -95,6 +95,7 @@ void session(tcp::socket sock)
       );
 
       printf("Response size: %d\n", p_msg0_resp_full->size);
+      printf("Response type: %d\n", p_msg0_resp_full->type);
 
 
       // free mem

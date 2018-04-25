@@ -77,6 +77,7 @@ int ra_network_send_receive(const char *server_url,
         //ra_samp_response_header_t* p_att_result_msg_full = NULL;
         *p_resp = (ra_samp_response_header_t*) malloc(sizeof(ra_samp_response_header_t));
         (*p_resp)->size = 0;
+        (*p_resp)->type = 0;
         //p_resp_msg = p_att_result_msg_full;
         ////////////////////////////////
         // END EDIT
