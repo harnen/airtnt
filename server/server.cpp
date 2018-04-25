@@ -57,8 +57,8 @@ void session(tcp::socket sock)
       }
       */
       ra_samp_request_header_t *header = (ra_samp_request_header_t*) data;
-      printf("%d\n", header->size);
-      printf("%d\n", header->type);
+      printf("Received size: %d\n", header->size);
+      printf("Received type: %d\n", header->type);
 
       sock.read_some(boost::asio::buffer(data+sizeof(*header), header->size), error);
       if (error == boost::asio::error::eof)
@@ -94,7 +94,7 @@ void session(tcp::socket sock)
         &p_msg0_resp_full
       );
 
-      printf("Size: %d\n", p_msg0_resp_full->size);
+      printf("Response size: %d\n", p_msg0_resp_full->size);
 
 
       // free mem
