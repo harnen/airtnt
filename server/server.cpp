@@ -56,7 +56,7 @@ void session(tcp::socket sock)
         break;
       }
       */
-      ra_samp_request_header_t *header = data;
+      ra_samp_request_header_t *header = (ra_samp_request_header_t*) data;
       printf("%d\n", header->size);
       printf("%d\n", header->type);
 
