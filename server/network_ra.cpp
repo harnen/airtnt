@@ -70,6 +70,17 @@ int ra_network_send_receive(const char *server_url,
         ret = sp_ra_proc_msg0_req((const sample_ra_msg0_t*)((uint8_t*)p_req
             + sizeof(ra_samp_request_header_t)),
             p_req->size);
+
+        ////////////////////////////////
+        // EDIT
+        ////////////////////////////////
+        *p_resp_msg = (ra_samp_response_header_t*) malloc(sizeof(ra_samp_response_header_t));
+        p_resp_msg->size = 0;
+        ////////////////////////////////
+        // END EDIT
+        ////////////////////////////////
+
+
         if (0 != ret)
         {
             fprintf(stderr, "\nError, call sp_ra_proc_msg1_req fail [%s].",
