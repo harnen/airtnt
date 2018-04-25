@@ -66,9 +66,9 @@ void session(tcp::socket sock)
       // EDIT
       ////////////////////////////////
       // set message
-      ra_samp_request_header_t p_msg0_full = (ra_samp_request_header_t*)
-        malloc(sizeof(ra_samp_request_header_t) +sizeof(uint32_t)
-      );
+      ra_samp_request_header_t *p_msg0_full = NULL;
+      p_msg0_full = (ra_samp_request_header_t*)
+        malloc(sizeof(ra_samp_request_header_t) +sizeof(uint32_t));
       p_msg0_full->type = TYPE_RA_MSG0; // read_msg_.type(); // e.g., TYPE_RA_MSG0;
       p_msg0_full->size = sizeof(uint32_t);
       uint32_t extended_epid_group_id = 0;
