@@ -127,6 +127,20 @@ int ra_network_send_receive(const char *server_url,
         ret = sp_ra_proc_msg_output_req((const life_input_t*) ((uint8_t*)p_req + 
                                 sizeof(ra_samp_request_header_t)),
                                 p_req->size);
+
+        ////////////////////////////////
+        // EDIT
+        ////////////////////////////////
+        //ra_samp_response_header_t* p_att_result_msg_full = NULL;
+        *p_resp = (ra_samp_response_header_t*) malloc(sizeof(ra_samp_response_header_t));
+        (*p_resp)->size = 0;
+        (*p_resp)->type = 4;
+        //p_resp_msg = p_att_result_msg_full;
+        ////////////////////////////////
+        // END EDIT
+        ////////////////////////////////
+
+
         break;
 
     default:
