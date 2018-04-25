@@ -17,7 +17,7 @@
 #include "chat_message.hpp"
 using boost::asio::ip::tcp;
 
-const int max_length = 1024;
+const int max_length = 2024;
 chat_message read_msg_;
 
 
