@@ -47,7 +47,7 @@
 
 // Needed to get service provider's information, in your real project, you will
 // need to talk to real server.
-#include "network_ra.h"
+#include "network.h"
 
 // Needed to create enclave and do ecall.
 #include "sgx_urts.h"
