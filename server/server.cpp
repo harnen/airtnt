@@ -94,6 +94,8 @@ void session(tcp::socket sock)
         &p_msg0_resp_full
       );
 
+      printf("Size: %d\n", p_msg0_resp_full->size);
+
 
       // free mem
       ra_free_network_response_buffer(p_msg0_resp_full);
