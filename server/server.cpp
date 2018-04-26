@@ -94,6 +94,8 @@ void session(tcp::socket sock)
         &p_msg0_resp_full
       );
 
+      printf("p_att_result_msg pointer: %d\n", p_msg0_resp_full);
+
       printf("Response size: %d\n", p_msg0_resp_full->size);
       printf("Response type: %d\n", p_msg0_resp_full->type);
 
