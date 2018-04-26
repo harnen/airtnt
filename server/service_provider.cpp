@@ -849,7 +849,8 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
     fprintf(stderr, "Encryption Done.\n");
 
     *pp_att_result_msg = p_att_result_msg;
-    printf("p_att_result_msg pointer: %d\n", *pp_att_result_msg);
+    printf("p_att_result_msg pointer: %d\n", p_att_result_msg);
+    printf("pp_att_result_msg pointer: %d\n", *pp_att_result_msg);
 
     fprintf(stderr, "Assignment Done.\n");
 
