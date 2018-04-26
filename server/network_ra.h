@@ -47,6 +47,7 @@ typedef enum _ra_msg_type_t
      TYPE_RA_MSG3,
      TYPE_RA_ATT_RESULT,
      TYPE_RA_OUTPUT,
+     TYPE_RA_INPUT,
 }ra_msg_type_t;
 
 /* Enum for all possible message types between the SP and IAS.
