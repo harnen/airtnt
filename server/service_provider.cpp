@@ -821,9 +821,10 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
     input->array[5] = '1';
 
 
-    *pp_att_result_msg = (ra_samp_response_header_t*)malloc(sizeof(ra_samp_response_header_t)+msg_size);
-    (*pp_att_result_msg)->type = 6;
-    (*pp_att_result_msg)->size = msg_size;
+    ra_samp_response_header_t *p_att_result_msg = (ra_samp_response_header_t*)malloc(sizeof(ra_samp_response_header_t)+msg_size);
+
+    p_att_result_msg->type = 6;
+    p_att_result_msg->size = msg_size;
 
 
     uint8_t aes_gcm_iv[SAMPLE_SP_IV_SIZE] = {0};
@@ -834,7 +835,7 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
         &global_key,
         (uint8_t*) input,
         msg_size,
-        (uint8_t*) (*pp_att_result_msg)+sizeof(ra_samp_response_header_t),
+        (uint8_t*) (p_att_result_msg)+sizeof(ra_samp_response_header_t),
         &aes_gcm_iv[0],
         SAMPLE_SP_IV_SIZE,
         NULL,
@@ -843,6 +844,8 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
     );
 
     fprintf(stderr, "Encryption Done.");
+
+    *pp_att_result_msg = p_att_result_msg;
 
 
     return 0;
