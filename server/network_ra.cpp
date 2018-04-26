@@ -151,11 +151,11 @@ int ra_network_send_receive(const char *server_url,
         else
         {
             *p_resp = p_resp_msg;
+            printf("NETWORK RA p_att_result_msg -- value pointer: %d\n", *p_resp);
         }
         break;
 
 
-        break;
 
     case TYPE_RA_INPUT:
         ret = sp_ra_proc_msg_input_req(
