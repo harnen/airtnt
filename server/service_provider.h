@@ -130,7 +130,8 @@ typedef struct sample_ra_msg3_t
 
 typedef struct sample_ra_msg_input_t
 {
-    uint8_t data[];
+    int id;
+    uint8_t quote[];
 } sample_ra_msg_input_t;
 
 int sp_ra_proc_msg0_req(const sample_ra_msg0_t *p_msg0,
