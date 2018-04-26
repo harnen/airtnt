@@ -829,7 +829,7 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
 
     uint8_t aes_gcm_iv[SAMPLE_SP_IV_SIZE] = {0};
 
-    fprintf(stderr, "Encryption TODO.");
+    fprintf(stderr, "Encryption TODO.\n");
     
     ret = sample_rijndael128GCM_encrypt(
         &global_key,
@@ -843,10 +843,11 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
         NULL
     );
 
-    fprintf(stderr, "Encryption Done.");
+    fprintf(stderr, "Encryption Done.\n");
 
     *pp_att_result_msg = p_att_result_msg;
 
+    fprintf(stderr, "Assignment Done.\n");
 
     return 0;
 }
