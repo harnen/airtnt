@@ -143,6 +143,16 @@ int ra_network_send_receive(const char *server_url,
         ////////////////////////////////
         // END EDIT
         ////////////////////////////////
+        if(0 != ret)
+        {
+            fprintf(stderr, "\nError, call sp_ra_proc_msg3_req fail [%s].",
+                __FUNCTION__);
+        }
+        else
+        {
+            *p_resp = p_resp_msg;
+        }
+        break;
 
 
         break;
