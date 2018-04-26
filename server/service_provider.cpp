@@ -824,7 +824,7 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
     ra_samp_response_header_t *p_att_result_msg = (ra_samp_response_header_t*)malloc(sizeof(ra_samp_response_header_t)+msg_size);
 
     printf("p_att_result_msg pointer: %d\n", p_att_result_msg);
-    
+
 
     p_att_result_msg->type = 6;
     p_att_result_msg->size = msg_size;
@@ -849,6 +849,7 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
     fprintf(stderr, "Encryption Done.\n");
 
     *pp_att_result_msg = p_att_result_msg;
+    printf("p_att_result_msg pointer: %d\n", *pp_att_result_msg);
 
     fprintf(stderr, "Assignment Done.\n");
 
