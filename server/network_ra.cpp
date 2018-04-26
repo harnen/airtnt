@@ -130,6 +130,8 @@ int ra_network_send_receive(const char *server_url,
                                 sizeof(ra_samp_request_header_t)),
                                 p_req->size, &p_resp_msg);
 
+        printf("NETWORK RA p_att_result_msg -- pointer: %d\n", p_resp_msg);
+
         ////////////////////////////////
         // EDIT
         ////////////////////////////////
