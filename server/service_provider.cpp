@@ -114,6 +114,8 @@ unsigned long msg_size = sizeof(life_input_t) + (size * size * sizeof(char));
 
 sample_spid_t g_spid;
 
+sample_aes_gcm_128bit_key_t global_key;
+
 
 // Verify message 0 then configure extended epid group.
 int sp_ra_proc_msg0_req(const sample_ra_msg0_t *p_msg0,
@@ -740,6 +742,11 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
                         0,
                         &p_att_result_msg->secret.payload_tag);
         }
+
+
+        // copy to global
+        memcpy(global_key, g_sp_db.sk_key, sizeof(sample_aes_gcm_128bit_key_t));
+
     }while(0);
 
     if(ret)
@@ -756,7 +763,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
 }
 
 int sp_ra_proc_msg_output_req(const life_input_t *p_output,
-                                uint32_t output_size){
+                                uint32_t output_size, ra_samp_response_header_t **pp_att_result_msg){
 
     uint8_t iv[12] = {0};
     printf("Got output size: %d\n", output_size); 
@@ -804,6 +811,36 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
     printf("\n");
 
 
+
+    life_input_t* input = (life_input_t*) malloc(msg_size);
+    input->size = size;
+    input->steps = 100;
+    memset(&input->array[0], '0', size * size);        
+    input->array[3] = '1';
+    input->array[4] = '1';
+    input->array[5] = '1';
+
+
+    *pp_att_result_msg = (ra_samp_response_header_t*)malloc(sizeof(ra_samp_response_header_t)+msg_size);
+    (*pp_att_result_msg)->type = 6;
+    (*pp_att_result_msg)->size = msg_size;
+
+
+    uint8_t aes_gcm_iv[SAMPLE_SP_IV_SIZE] = {0};
+    
+    ret = sample_rijndael128GCM_encrypt(
+        &global_key,
+        (uint8_t*) input,
+        msg_size,
+        (uint8_t*) (*pp_att_result_msg)+sizeof(ra_samp_response_header_t),
+        &aes_gcm_iv[0],
+        SAMPLE_SP_IV_SIZE,
+        NULL,
+        0,
+        NULL
+    );
+
+
     return 0;
 }
 
@@ -839,250 +876,7 @@ int sp_ra_proc_msg_input_req(const sample_ra_msg_input_t *p_msg3, uint32_t msg3_
     }
     do
     {
-        /*
-        // Compare g_a in message 3 with local g_a.
-        ret = memcmp(&g_sp_db.g_a, &p_msg3->g_a, sizeof(sample_ec_pub_t));
-        if(ret)
-        {
-            fprintf(stderr, "\nError, g_a is not same [%s].", __FUNCTION__);
-            ret = SP_PROTOCOL_ERROR;
-            break;
-        }
-        //Make sure that msg3_size is bigger than sample_mac_t.
-        uint32_t mac_size = msg3_size - sizeof(sample_mac_t);
-        p_msg3_cmaced = reinterpret_cast<const uint8_t*>(p_msg3);
-        p_msg3_cmaced += sizeof(sample_mac_t);
 
-        // Verify the message mac using SMK
-        sample_cmac_128bit_tag_t mac = {0};
-        sample_ret = sample_rijndael128_cmac_msg(&g_sp_db.smk_key,
-                                           p_msg3_cmaced,
-                                           mac_size,
-                                           &mac);
-        if(SAMPLE_SUCCESS != sample_ret)
-        {
-            fprintf(stderr, "\nError, cmac fail in [%s].", __FUNCTION__);
-            ret = SP_INTERNAL_ERROR;
-            break;
-        }
-        // In real implementation, should use a time safe version of memcmp here,
-        // in order to avoid side channel attack.
-        ret = memcmp(&p_msg3->mac, mac, sizeof(mac));
-        if(ret)
-        {
-            fprintf(stderr, "\nError, verify cmac fail [%s].", __FUNCTION__);
-            ret = SP_INTEGRITY_FAILED;
-            break;
-        }
-
-        if(memcpy_s(&g_sp_db.ps_sec_prop, sizeof(g_sp_db.ps_sec_prop),
-            &p_msg3->ps_sec_prop, sizeof(p_msg3->ps_sec_prop)))
-        {
-            fprintf(stderr,"\nError, memcpy failed in [%s].", __FUNCTION__);
-            ret = SP_INTERNAL_ERROR;
-            break;
-        }
-
-        p_quote = (sample_quote_t *)p_msg3->quote;
-        */
-
-        // Check the quote version if needed. Only check the Quote.version field if the enclave
-        // identity fields have changed or the size of the quote has changed.  The version may
-        // change without affecting the legacy fields or size of the quote structure.
-        //if(p_quote->version < ACCEPTED_QUOTE_VERSION)
-        //{
-        //    fprintf(stderr,"\nError, quote version is too old.", __FUNCTION__);
-        //    ret = SP_QUOTE_VERSION_ERROR;
-        //    break;
-        //}
-
-        // Verify the report_data in the Quote matches the expected value.
-        // The first 32 bytes of report_data are SHA256 HASH of {ga|gb|vk}.
-        // The second 32 bytes of report_data are set to zero.
-        /*
-        sample_ret = sample_sha256_init(&sha_handle);
-        if(sample_ret != SAMPLE_SUCCESS)
-        {
-            fprintf(stderr,"\nError, init hash failed in [%s].", __FUNCTION__);
-            ret = SP_INTERNAL_ERROR;
-            break;
-        }
-        sample_ret = sample_sha256_update((uint8_t *)&(g_sp_db.g_a),
-                                     sizeof(g_sp_db.g_a), sha_handle);
-        if(sample_ret != SAMPLE_SUCCESS)
-        {
-            fprintf(stderr,"\nError, udpate hash failed in [%s].",
-                    __FUNCTION__);
-            ret = SP_INTERNAL_ERROR;
-            break;
-        }
-        sample_ret = sample_sha256_update((uint8_t *)&(g_sp_db.g_b),
-                                     sizeof(g_sp_db.g_b), sha_handle);
-        if(sample_ret != SAMPLE_SUCCESS)
-        {
-            fprintf(stderr,"\nError, udpate hash failed in [%s].",
-                    __FUNCTION__);
-            ret = SP_INTERNAL_ERROR;
-            break;
-        }
-        sample_ret = sample_sha256_update((uint8_t *)&(g_sp_db.vk_key),
-                                     sizeof(g_sp_db.vk_key), sha_handle);
-        if(sample_ret != SAMPLE_SUCCESS)
-        {
-            fprintf(stderr,"\nError, udpate hash failed in [%s].",
-                    __FUNCTION__);
-            ret = SP_INTERNAL_ERROR;
-            break;
-        }
-        sample_ret = sample_sha256_get_hash(sha_handle,
-                                      (sample_sha256_hash_t *)&report_data);
-        if(sample_ret != SAMPLE_SUCCESS)
-        {
-            fprintf(stderr,"\nError, Get hash failed in [%s].", __FUNCTION__);
-            ret = SP_INTERNAL_ERROR;
-            break;
-        }
-        ret = memcmp((uint8_t *)&report_data,
-                     (uint8_t *)&(p_quote->report_body.report_data),
-                     sizeof(report_data));
-        if(ret)
-        {
-            fprintf(stderr, "\nError, verify hash fail [%s].", __FUNCTION__);
-            ret = SP_INTEGRITY_FAILED;
-            break;
-        }
-
-
-        // Verify Enclave policy (an attestation server may provide an API for this if we
-        // registered an Enclave policy)
-        
-        // Verify quote with attestation server.
-        // In the product, an attestation server could use a REST message and JSON formatting to request
-        // attestation Quote verification.  The sample only simulates this interface.
-        ias_att_report_t attestation_report = {0};
-        ret = g_sp_extended_epid_group_id->verify_attestation_evidence(p_quote, NULL,
-                                              &attestation_report);
-        if(0 != ret)
-        {
-            ret = SP_IAS_FAILED;
-            break;
-        }
-        FILE* OUTPUT = stdout;
-        fprintf(OUTPUT, "\n\n\tAttestation Report:");
-        fprintf(OUTPUT, "\n\tid: 0x%0x.", attestation_report.id);
-        fprintf(OUTPUT, "\n\tstatus: %d.", attestation_report.status);
-        fprintf(OUTPUT, "\n\trevocation_reason: %u.",
-                attestation_report.revocation_reason);
-        // attestation_report.info_blob;
-        fprintf(OUTPUT, "\n\tpse_status: %d.",  attestation_report.pse_status);
-        // Note: This sample always assumes the PIB is sent by attestation server.  In the product
-        // implementation, the attestation server could only send the PIB for certain attestation 
-        // report statuses.  A product SP implementation needs to handle cases
-        // where the PIB is zero length.
-
-        // Respond the client with the results of the attestation.
-        uint32_t att_result_msg_size = sizeof(sample_ra_att_result_msg_t);
-        p_att_result_msg_full =
-            (ra_samp_response_header_t*)malloc(att_result_msg_size
-            + sizeof(ra_samp_response_header_t) + msg_size);
-        if(!p_att_result_msg_full)
-        {
-            fprintf(stderr, "\nError, out of memory in [%s].", __FUNCTION__);
-            ret = SP_INTERNAL_ERROR;
-            break;
-        }
-        memset(p_att_result_msg_full, 0, att_result_msg_size
-               + sizeof(ra_samp_response_header_t) + msg_size);
-        p_att_result_msg_full->type = TYPE_RA_ATT_RESULT;
-        p_att_result_msg_full->size = att_result_msg_size + msg_size;
-        if(IAS_QUOTE_OK != attestation_report.status)
-        {
-            p_att_result_msg_full->status[0] = 0xFF;
-        }
-        if(IAS_PSE_OK != attestation_report.pse_status)
-        {
-            p_att_result_msg_full->status[1] = 0xFF;
-        }
-
-        p_att_result_msg =
-            (sample_ra_att_result_msg_t *)p_att_result_msg_full->body;
-
-        // In a product implementation of attestation server, the HTTP response header itself could have
-        // an RK based signature that the service provider needs to check here.
-
-        // The platform_info_blob signature will be verified by the client
-        // when sent. No need to have the Service Provider to check it.  The SP
-        // should pass it down to the application for further analysis.
-
-        fprintf(OUTPUT, "\n\n\tEnclave Report:");
-        fprintf(OUTPUT, "\n\tSignature Type: 0x%x", p_quote->sign_type);
-        fprintf(OUTPUT, "\n\tSignature Basename: ");
-        for(i=0; i<sizeof(p_quote->basename.name) && p_quote->basename.name[i];
-            i++)
-        {
-            fprintf(OUTPUT, "%c", p_quote->basename.name[i]);
-        }
-#ifdef __x86_64__
-        fprintf(OUTPUT, "\n\tattributes.flags: 0x%0lx",
-                p_quote->report_body.attributes.flags);
-        fprintf(OUTPUT, "\n\tattributes.xfrm: 0x%0lx",
-                p_quote->report_body.attributes.xfrm);
-#else
-        fprintf(OUTPUT, "\n\tattributes.flags: 0x%0llx",
-                p_quote->report_body.attributes.flags);
-        fprintf(OUTPUT, "\n\tattributes.xfrm: 0x%0llx",
-                p_quote->report_body.attributes.xfrm);
-#endif
-        fprintf(OUTPUT, "\n\tmr_enclave: ");
-        for(i=0;i<sizeof(sample_measurement_t);i++)
-        {
-
-            fprintf(OUTPUT, "%02x",p_quote->report_body.mr_enclave[i]);
-
-            //fprintf(stderr, "%02x",p_quote->report_body.mr_enclave.m[i]);
-
-        }
-        fprintf(OUTPUT, "\n\tmr_signer: ");
-        for(i=0;i<sizeof(sample_measurement_t);i++)
-        {
-
-            fprintf(OUTPUT, "%02x",p_quote->report_body.mr_signer[i]);
-
-            //fprintf(stderr, "%02x",p_quote->report_body.mr_signer.m[i]);
-
-        }
-        fprintf(OUTPUT, "\n\tisv_prod_id: 0x%0x",
-                p_quote->report_body.isv_prod_id);
-        fprintf(OUTPUT, "\n\tisv_svn: 0x%0x",p_quote->report_body.isv_svn);
-        fprintf(OUTPUT, "\n");
-
-        // A product service provider needs to verify that its enclave properties 
-        // match what is expected.  The SP needs to check these values before
-        // trusting the enclave.  For the sample, we always pass the policy check.
-        // Attestation server only verifies the quote structure and signature.  It does not 
-        // check the identity of the enclave.
-        bool isv_policy_passed = true;
-
-        // Assemble Attestation Result Message
-        // Note, this is a structure copy.  We don't copy the policy reports
-        // right now.
-        p_att_result_msg->platform_info_blob = attestation_report.info_blob;
-
-        // Generate mac based on the mk key.
-        mac_size = sizeof(ias_platform_info_blob_t);
-        sample_ret = sample_rijndael128_cmac_msg(&g_sp_db.mk_key,
-            (const uint8_t*)&p_att_result_msg->platform_info_blob,
-            mac_size,
-            &p_att_result_msg->mac);
-        if(SAMPLE_SUCCESS != sample_ret)
-        {
-            fprintf(stderr, "\nError, cmac fail in [%s].", __FUNCTION__);
-            ret = SP_INTERNAL_ERROR;
-            break;
-        }
-
-        // Generate shared secret and encrypt it with SK, if attestation passed.
-       */
     
         life_input_t* input = (life_input_t*) malloc(msg_size);
         input->size = size;
