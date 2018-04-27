@@ -846,6 +846,8 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
         NULL
     );
 
+    free(input);
+    
     fprintf(stderr, "Encryption Done.\n");
 
     *pp_att_result_msg = p_att_result_msg;
