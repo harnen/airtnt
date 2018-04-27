@@ -323,7 +323,7 @@ int main(int argc, char* argv[])
             ret = sgx_ra_get_msg1(context, enclave_id, sgx_ra_get_ga,
                                   (sgx_ra_msg1_t*)((uint8_t*)p_msg1_full
                                   + sizeof(ra_samp_request_header_t)));
-            sleep(3); // Wait 3s between retries
+            //sleep(3); // Wait 3s between retries
         } while (SGX_ERROR_BUSY == ret && busy_retry_time--);
         if(SGX_SUCCESS != ret)
         {
@@ -663,13 +663,14 @@ int main(int argc, char* argv[])
         // passed)
 
         ra_samp_response_header_t* p_msg_reply = (ra_samp_response_header_t*)  malloc(sizeof(ra_samp_response_header_t) + p_att_result_msg_body->secret.payload_size);
-        
+        uint8_t* buffer = (uint8_t*)  malloc(p_att_result_msg_body->secret.payload_size);
+        memcpy(buffer, p_att_result_msg_body->secret.payload, p_att_result_msg_body->secret.payload_size);
         
         if(attestation_passed)
         {
 
             printf("Received msg size: %d\n", p_att_result_msg_body->secret.payload_size);
-
+            
             int result_size;
             uint8_t* result = (uint8_t*) malloc(p_att_result_msg_body->secret.payload_size);
             sgx_aes_gcm_128bit_key_t result_key;
@@ -682,7 +683,7 @@ int main(int argc, char* argv[])
             ret = put_secret_data(enclave_id,
                                   &status,
                                   context,
-                                  p_att_result_msg_body->secret.payload,
+                                  buffer, //p_att_result_msg_body->secret.payload,
                                   p_att_result_msg_body->secret.payload_size,
                                   p_att_result_msg_body->secret.payload_tag,
                                   result,
