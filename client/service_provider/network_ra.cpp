@@ -102,7 +102,9 @@ int ra_network_send_receive(const char *server_url,
     wrote = boost::asio::write(s, 
                                boost::asio::buffer(p_req, 
                                p_req->size + sizeof (ra_samp_request_header_t)));
+
     printf("Wrote %d bytes of Msg %d\n", wrote, p_req->type);
+
     if (wrote != (p_req->size + sizeof (ra_samp_request_header_t)))
     {
         fprintf(stderr, "\nError, sending the message [%s].",
@@ -115,6 +117,7 @@ int ra_network_send_receive(const char *server_url,
     read = boost::asio::read(s,
                              boost::asio::buffer(reply, sizeof(ra_samp_response_header_t)));
     printf("Read %d bytes \n", read);
+
     ra_samp_response_header_t* reply_header = (ra_samp_response_header_t*) reply;
     printf("Received a header, size: %d, type: %d\n", reply_header->size, reply_header->type);
 
