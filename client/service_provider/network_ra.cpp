@@ -126,6 +126,7 @@ int ra_network_send_receive(const char *server_url,
         read = boost::asio::read(s,
                                  boost::asio::buffer(reply + sizeof(ra_samp_response_header_t), reply_header->size)); 
         *p_resp = (ra_samp_response_header_t*) reply;
+        printf("Setting the response pointer to %d\n", reply);
     }else{
         printf("Nothing else to read\n");
     }

@@ -662,7 +662,7 @@ int main(int argc, char* argv[])
         // Get the shared secret sent by the server using SK (if attestation
         // passed)
 
-        ra_samp_response_header_t* p_msg_reply = (ra_samp_response_header_t*)  malloc(sizeof(ra_samp_response_header_t) + p_att_result_msg_body->secret.payload_size);
+        uint8_t* p_msg_reply;
         uint8_t* buffer = (uint8_t*)  malloc(p_att_result_msg_body->secret.payload_size);
         memcpy(buffer, p_att_result_msg_body->secret.payload, p_att_result_msg_body->secret.payload_size);
         uint8_t* result = (uint8_t*) malloc(p_att_result_msg_body->secret.payload_size);
@@ -713,7 +713,13 @@ int main(int argc, char* argv[])
 
                 ret = ra_network_send_receive("http://SampleServiceProvider.intel.com/",
                                         p_msg_result,
-                                        &p_msg_reply); //TODO: Change it - for now, we don't assume any response
+                                        (ra_samp_response_header_t**) &p_msg_reply); //TODO: Change it - for now, we don't assume any response
+
+                printf("Received network buffer: ");
+                for(int i = 0; i < sizeof(ra_samp_response_header_t) + p_att_result_msg_body->secret.payload_size; i++){
+                    printf("%d,", p_msg_reply[i]);
+                }
+                memcpy(buffer, (uint8_t*) p_msg_reply + sizeof(ra_samp_response_header_t), p_att_result_msg_body->secret.payload_size); 
                 getchar();
             }while(1);
 
