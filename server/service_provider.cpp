@@ -850,11 +850,12 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
     p_att_result_msg = (sample_ra_att_result_msg_t *)p_att_result_msg_full->body;
 
 
+    uint8_t* tmp = (uint8_t*) input;
     // printing input
     printf("Created an input message. Size: %lu\n", msg_size);
     for(int i = 0; i < msg_size; i++){
         //printf("%c ", input->array[i*size + j]);
-        printf("%d ", (uint8_t)input[i]);
+        printf("%d ", tmp[i]);
     } 
      printf("\n");
 
@@ -865,7 +866,7 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
     
     ret = sample_rijndael128GCM_encrypt(
         &global_key,
-        (uint8_t*) input,
+        tmp,
         msg_size,
         (uint8_t*) (p_att_result_msg),
         //p_att_result_msg->secret.payload,
@@ -876,9 +877,10 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
         NULL
     );
 
+    tmp = (uint8_t*) p_att_result_msg;
     printf("Printing payload:\n");
         for (int i = 0; i < msg_size; ++i) {
-            printf("%d ", p_att_result_msg[i]);
+            printf("%d ", tmp[i]);//p_att_result_msg[i]);
         }
         printf("\n");
 
