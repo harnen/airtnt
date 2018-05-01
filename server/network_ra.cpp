@@ -51,7 +51,10 @@
 
 int ra_network_send_receive(const char *server_url,
     const ra_samp_request_header_t *p_req,
-    ra_samp_response_header_t **p_resp)
+    ra_samp_response_header_t **p_resp,
+    int steps, 
+    int max_iterations
+)
 {
     int ret = 0;
     ra_samp_response_header_t* p_resp_msg;
@@ -128,7 +131,7 @@ int ra_network_send_receive(const char *server_url,
     case TYPE_RA_OUTPUT:
         ret = sp_ra_proc_msg_output_req((const life_input_t*) ((uint8_t*)p_req + 
                                 sizeof(ra_samp_request_header_t)),
-                                p_req->size, &p_resp_msg);
+                                p_req->size, &p_resp_msg, steps, max_iterations);
 
         printf("NETWORK RA p_att_result_msg -- pointer: %d\n", p_resp_msg);
 

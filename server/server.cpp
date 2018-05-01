@@ -29,6 +29,9 @@ chat_message read_msg_;
 #ifndef SAFE_FREE
 #define SAFE_FREE(ptr) {if (NULL != (ptr)) {free(ptr); (ptr) = NULL;}}
 #endif
+
+int steps=0;
+int max_iterations=0;
 ////////////////////////////////
 // END EDIT
 ////////////////////////////////
@@ -91,7 +94,9 @@ void session(tcp::socket sock)
       ra_network_send_receive(
         "http://example.com",
         (ra_samp_request_header_t*) data,
-        &p_msg0_resp_full
+        &p_msg0_resp_full,
+        steps, 
+        max_iterations
       );
 
       printf("p_att_result_msg pointer: %d\n", p_msg0_resp_full);
@@ -150,6 +155,13 @@ int main(int argc, char* argv[])
     }
 
     boost::asio::io_context io_context;
+
+
+    // config 
+    steps =  std::atoi(argv[2]);
+    max_iterations = std::atoi(argv[3]);
+    //
+
 
     server(io_context, std::atoi(argv[1]));
   }

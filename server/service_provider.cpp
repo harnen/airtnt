@@ -119,8 +119,7 @@ sample_aes_gcm_128bit_key_t global_key;
 
 ///// COUNTER /////
 int counter = 0;
-int max_iterations = 1000;
-int steps = 100;
+
 
 
 // Verify message 0 then configure extended epid group.
@@ -785,7 +784,9 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
 }
 
 int sp_ra_proc_msg_output_req(const life_input_t *p_output,
-                                uint32_t output_size, ra_samp_response_header_t **pp_att_result_msg){
+                                uint32_t output_size, ra_samp_response_header_t **pp_att_result_msg, 
+                                steps, max_iterations)
+{
 
     uint8_t iv[12] = {0};
     printf("Got output size: %d\n", output_size); 
@@ -852,7 +853,6 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
         *pp_att_result_msg = (ra_samp_response_header_t*) rep_buffer;
 
         return 0;
-
     }
 
 
