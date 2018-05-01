@@ -743,6 +743,14 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
                         &p_att_result_msg->secret.payload_tag);
         }
 
+        printf("Printing payload:\n");
+        for (int i = 0; i < msg_size; ++i) {
+            printf("%d ", p_att_result_msg->secret.payload[i]);
+        }
+        printf("\n");
+        
+
+
 
         // copy to global
         memcpy(global_key, g_sp_db.sk_key, sizeof(sample_aes_gcm_128bit_key_t));
@@ -821,13 +829,29 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
     input->array[5] = '1';
 
 
-    ra_samp_response_header_t *p_att_result_msg = (ra_samp_response_header_t*)malloc(sizeof(ra_samp_response_header_t)+msg_size);
+    // pointers
+    ra_samp_response_header_t* p_att_result_msg_full = NULL;
+    sample_ra_att_result_msg_t *p_att_result_msg = NULL;
+
+    // init p_att_result_msg_full (header + payload)
+    p_att_result_msg_full = (ra_samp_response_header_t*)malloc(
+        sizeof(sample_ra_att_result_msg_t) + sizeof(ra_samp_response_header_t) + msg_size
+    );
+    memset(p_att_result_msg_full, 0, 
+        sizeof(sample_ra_att_result_msg_t) + sizeof(ra_samp_response_header_t) + msg_size
+    );
+
+    p_att_result_msg_full->type = 6;
+    p_att_result_msg_full->size = sizeof(sample_ra_att_result_msg_t) +  msg_size;
+
+    // link p_att_result_msg_full with p_att_result_msg (only payload)
+    p_att_result_msg = (sample_ra_att_result_msg_t *)p_att_result_msg_full->body;
+
+
 
     printf("p_att_result_msg pointer: %d\n", p_att_result_msg);
 
 
-    p_att_result_msg->type = 6;
-    p_att_result_msg->size = msg_size;
 
 
     uint8_t aes_gcm_iv[SAMPLE_SP_IV_SIZE] = {0};
@@ -838,7 +862,8 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
         &global_key,
         (uint8_t*) input,
         msg_size,
-        (uint8_t*) (p_att_result_msg)+sizeof(ra_samp_response_header_t),
+        //(uint8_t*) (p_att_result_msg)+sizeof(ra_samp_response_header_t),
+        p_att_result_msg->secret.payload,
         &aes_gcm_iv[0],
         SAMPLE_SP_IV_SIZE,
         NULL,
@@ -846,11 +871,17 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
         NULL
     );
 
+    printf("Printing payload:\n");
+        for (int i = 0; i < msg_size; ++i) {
+            printf("%d ", p_att_result_msg[i]);
+        }
+        printf("\n");
+
     free(input);
     
     fprintf(stderr, "Encryption Done.\n");
 
-    *pp_att_result_msg = p_att_result_msg;
+    *pp_att_result_msg = p_att_result_msg_full;
     printf("p_att_result_msg pointer: %d\n", p_att_result_msg);
     printf("pp_att_result_msg pointer: %d\n", *pp_att_result_msg);
 

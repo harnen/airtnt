@@ -132,17 +132,6 @@ int ra_network_send_receive(const char *server_url,
 
         printf("NETWORK RA p_att_result_msg -- pointer: %d\n", p_resp_msg);
 
-        ////////////////////////////////
-        // EDIT
-        ////////////////////////////////
-        //ra_samp_response_header_t* p_att_result_msg_full = NULL;
-        //*p_resp = (ra_samp_response_header_t*) malloc(sizeof(ra_samp_response_header_t));
-        //(*p_resp)->size = 0;
-        //(*p_resp)->type = TYPE_RA_INPUT;
-        //p_resp_msg = p_att_result_msg_full;
-        ////////////////////////////////
-        // END EDIT
-        ////////////////////////////////
         if(0 != ret)
         {
             fprintf(stderr, "\nError, call sp_ra_proc_msg3_req fail [%s].",
