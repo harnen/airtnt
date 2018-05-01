@@ -890,7 +890,7 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
     );
 
 
-    uint8_t buf_test[msg_size]
+    uint8_t buf_test[msg_size];
     decrypt(
         global_key,
         ebuf,
