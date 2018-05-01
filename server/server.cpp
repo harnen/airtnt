@@ -25,6 +25,7 @@ chat_message read_msg_;
 // EDIT
 ////////////////////////////////
 #include "network_ra.h"
+#include <time.h>
 
 #ifndef SAFE_FREE
 #define SAFE_FREE(ptr) {if (NULL != (ptr)) {free(ptr); (ptr) = NULL;}}
@@ -38,6 +39,9 @@ int max_iterations=0;
 
 void session(tcp::socket sock)
 {
+    struct timeval t_connected, t_finished;
+    gettimeofday(&t_connected,NULL);
+    unsigned long m_connected = 1000000 * t_connected.tv_sec + t_connected.tv_usec;
   try
   {
     for (;;)
@@ -62,12 +66,14 @@ void session(tcp::socket sock)
       ra_samp_request_header_t *header = (ra_samp_request_header_t*) data;
       printf("Received size: %d\n", header->size);
       printf("Received type: %d\n", header->type);
+        
 
       sock.read_some(boost::asio::buffer(data+sizeof(*header), header->size), error);
-      if (error == boost::asio::error::eof)
+      if (error == boost::asio::error::eof){
         break; // Connection closed cleanly by peer.
-      else if (error)
+      }else if (error){
         throw boost::system::system_error(error); // Some other error.
+      }
 
 
 
@@ -104,6 +110,11 @@ void session(tcp::socket sock)
       printf("Response size: %d\n", p_msg0_resp_full->size);
       printf("Response type: %d\n", p_msg0_resp_full->type);
 
+      if((!p_msg0_resp_full->size) && (p_msg0_resp_full->type == 6)){
+        gettimeofday(&t_finished,NULL);
+        unsigned long m_finished = 1000000 * t_finished.tv_sec + t_finished.tv_usec;
+        printf("Time connected [us] %lu, time finished [us] %lu, time diff [us] %lu\n", m_connected, m_finished, m_finished - m_connected);
+      }
 
       ////////////////////////////////
       // END EDIT
@@ -116,8 +127,6 @@ void session(tcp::socket sock)
         p_msg0_resp_full, 
         sizeof(ra_samp_response_header_t) + p_msg0_resp_full->size)
       );
-
-
 
       ////////////////////////////////
       // EDIT

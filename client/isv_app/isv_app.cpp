@@ -620,6 +620,7 @@ int main(int argc, char* argv[])
                 sizeof(ias_platform_info_blob_t),
                 (uint8_t*)&p_att_result_msg_body->mac,
                 sizeof(sgx_mac_t));
+//        ret = SGX_SUCCESS;
         if((SGX_SUCCESS != ret) ||
            (SGX_SUCCESS != status))
         {
@@ -666,7 +667,8 @@ int main(int argc, char* argv[])
         uint8_t* buffer = (uint8_t*)  malloc(p_att_result_msg_body->secret.payload_size);
         memcpy(buffer, p_att_result_msg_body->secret.payload, p_att_result_msg_body->secret.payload_size);
         uint8_t* result = (uint8_t*) malloc(p_att_result_msg_body->secret.payload_size);
-        
+ 
+        int counter = 0;       
         if(attestation_passed)
         {
             do{
@@ -715,12 +717,13 @@ int main(int argc, char* argv[])
                                         p_msg_result,
                                         (ra_samp_response_header_t**) &p_msg_reply); //TODO: Change it - for now, we don't assume any response
 
-                printf("Received network buffer: ");
+                printf("Received network buffer (%d): ", p_att_result_msg_body->secret.payload_size);
                 for(int i = 0; i < sizeof(ra_samp_response_header_t) + p_att_result_msg_body->secret.payload_size; i++){
                     printf("%d,", p_msg_reply[i]);
                 }
                 memcpy(buffer, (uint8_t*) p_msg_reply + sizeof(ra_samp_response_header_t), p_att_result_msg_body->secret.payload_size); 
-                getchar();
+//                getchar();
+                printf("Counter %d\n", counter++);
             }while(1);
 
             free(result);
