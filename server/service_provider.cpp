@@ -785,7 +785,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
 
 int sp_ra_proc_msg_output_req(const life_input_t *p_output,
                                 uint32_t output_size, ra_samp_response_header_t **pp_att_result_msg, 
-                                steps, max_iterations)
+                                int steps, int max_iterations)
 {
 
     uint8_t iv[12] = {0};
