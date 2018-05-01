@@ -760,6 +760,12 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
         // copy to global
         memcpy(global_key, g_sp_db.sk_key, sizeof(sample_aes_gcm_128bit_key_t));
 
+        fprintf(stderr, "ENC KEY:\n");
+        for (int i = 0; i < sizeof(sample_aes_gcm_128bit_key_t); ++i)
+        {
+            fprintf(stderr, "%d\n", global_key[i]);
+        }
+
     }while(0);
 
     if(ret)
