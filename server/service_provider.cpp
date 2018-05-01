@@ -852,14 +852,11 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
 
     // printing input
     printf("Created an input message. Size: %lu\n", msg_size);
-    for(int i = 0; i < size; i++){
-        for(int j = 0; j < size; j++){
-            printf("%c ", input->array[i*size + j]);
-        }
-        printf("\n");
+    for(int i = 0; i < msg_size; i++){
+            //printf("%c ", input->array[i*size + j]);
+            printf("%c ", input[i]);
     } 
-
-
+     printf("\n");
 
 
     uint8_t aes_gcm_iv[SAMPLE_SP_IV_SIZE] = {0};
