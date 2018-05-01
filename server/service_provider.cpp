@@ -841,23 +841,23 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
 
 
     // pointers
-    ra_samp_response_header_t* p_att_result_msg_full = NULL;
-    sample_ra_att_result_msg_t *p_att_result_msg = NULL;
+    ra_samp_response_header_t* rep_header = NULL;
+    
 
     // init p_att_result_msg_full (header + payload)
-    p_att_result_msg_full = (ra_samp_response_header_t*)malloc(
+    uint8_t* rep_buffer = (uint8_t*) malloc(
         sizeof(ra_samp_response_header_t) + msg_size
     );
-    memset(p_att_result_msg_full, 0, 
+    rep_header = (ra_samp_response_header_t*) rep_buffer; 
+
+    memset(rep_buffer, 0, 
         sizeof(ra_samp_response_header_t) + msg_size
     );
 
-    p_att_result_msg_full->type = 6;
-    p_att_result_msg_full->size = msg_size;
-    printf("MESSAGE SIZE: %d\n", p_att_result_msg_full->size);
+    rep_header->type = 6;
+    rep_header->size = msg_size;
+    printf("MESSAGE SIZE: %d\n", rep_header->size);
 
-    // link p_att_result_msg_full with p_att_result_msg (only payload)
-    p_att_result_msg = (sample_ra_att_result_msg_t *)p_att_result_msg_full->body;
 
 
     uint8_t* tmp = (uint8_t*) input;
@@ -877,12 +877,12 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
     {
         fprintf(stderr, "%d\n", global_key[i]);
     }
-    
+    uint8_t* ebuf =  (uint8_t*) malloc (msg_size); //(uint8_t*) p_att_result_msg;
     ret = sample_rijndael128GCM_encrypt(
         &global_key,
         tmp,
         msg_size,
-        (uint8_t*) (p_att_result_msg),
+        ebuf, //(uint8_t*) (p_att_result_msg),
         //p_att_result_msg->secret.payload,
         &aes_gcm_iv[0],
         SAMPLE_SP_IV_SIZE,
@@ -891,20 +891,24 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
         NULL
     );
 
-    tmp = (uint8_t*) p_att_result_msg;
+    memcpy(rep_buffer + sizeof(ra_samp_response_header_t), ebuf, msg_size);
     printf("Printing payload:\n");
         for (int i = 0; i < msg_size; ++i) {
-            printf("%d ", tmp[i]);//p_att_result_msg[i]);
+            printf("%d ", rep_buffer[i]);//p_att_result_msg[i]);
         }
         printf("\n");
 
+        for (int i = 0; i < msg_size; ++i) {
+            printf("%d ", ebuf[i]);//p_att_result_msg[i]);
+        }
+        printf("\n");
     free(input);
     
     fprintf(stderr, "Encryption Done.\n");
 
-    *pp_att_result_msg = p_att_result_msg_full;
-    printf("p_att_result_msg pointer: %d\n", p_att_result_msg);
-    printf("pp_att_result_msg pointer: %d\n", *pp_att_result_msg);
+    *pp_att_result_msg = (ra_samp_response_header_t*) rep_buffer;
+/*    printf("p_att_result_msg pointer: %d\n", p_att_result_msg);
+    printf("pp_att_result_msg pointer: %d\n", *pp_att_result_msg);*/
 
     fprintf(stderr, "Assignment Done.\n");
 
