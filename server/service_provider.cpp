@@ -853,8 +853,8 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
     // printing input
     printf("Created an input message. Size: %lu\n", msg_size);
     for(int i = 0; i < msg_size; i++){
-            //printf("%c ", input->array[i*size + j]);
-            printf("%c ", input[i]);
+        //printf("%c ", input->array[i*size + j]);
+        printf("%d ", (uint8_t)input[i]);
     } 
      printf("\n");
 
