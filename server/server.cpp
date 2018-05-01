@@ -157,7 +157,7 @@ int main(int argc, char* argv[])
 {
   try
   {
-    if (argc != 2)
+    if (argc != 4)
     {
       std::cerr << "Usage: blocking_tcp_echo_server <port>\n";
       return 1;
