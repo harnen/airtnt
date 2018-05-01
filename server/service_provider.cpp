@@ -876,6 +876,7 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
     printf("\n");
     uint8_t* ebuf =  (uint8_t*) malloc (msg_size); //(uint8_t*) p_att_result_msg;
 
+    /*
     ret = sample_rijndael128GCM_encrypt(
         &global_key,
         tmp,
@@ -888,6 +889,19 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
         0,
         NULL
     );
+    */
+    encrypt(
+        global_key,
+        tmp,
+        msg_size,
+        ebuf,
+        &aes_gcm_iv[0],
+        SAMPLE_SP_IV_SIZE,
+        NULL,
+        0,
+        NULL
+    );
+
 
 
     uint8_t buf_test[msg_size];
@@ -906,7 +920,7 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
     printf("Test dect: \n");
     for (int i = 0; i < msg_size; ++i)
     {
-        printf("%d\n", buf_test[i]);
+        printf("%d ", buf_test[i]);
     }
     printf("\n");
 
