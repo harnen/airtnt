@@ -117,6 +117,12 @@ sample_spid_t g_spid;
 sample_aes_gcm_128bit_key_t global_key;
 
 
+///// COUNTER /////
+int counter = 0;
+int max_iterations = 1000;
+int steps = 100;
+
+
 // Verify message 0 then configure extended epid group.
 int sp_ra_proc_msg0_req(const sample_ra_msg0_t *p_msg0,
     uint32_t msg0_size)
@@ -445,6 +451,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
                         uint32_t msg3_size,
                         ra_samp_response_header_t **pp_att_result_msg)
 {
+
     int ret = 0;
     sample_status_t sample_ret = SAMPLE_SUCCESS;
     const uint8_t *p_msg3_cmaced = NULL;
@@ -826,10 +833,32 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
     printf("\n");
 
 
+    if (counter > max_iterations) {
+
+        // init resp buffers
+        uint8_t* rep_buffer = (uint8_t*) malloc(
+            sizeof(ra_samp_response_header_t) + msg_size
+        );
+        memset(rep_buffer, 0, 
+            sizeof(ra_samp_response_header_t) + msg_size
+        );
+        ra_samp_response_header_t* rep_header = (ra_samp_response_header_t*) rep_buffer; 
+
+        // set size to zero
+        rep_header->type = 6;
+        rep_header->size = 0;
+
+        // copy result to server
+        *pp_att_result_msg = (ra_samp_response_header_t*) rep_buffer;
+
+        return 0;
+
+    }
+
 
     life_input_t* input = (life_input_t*) malloc(msg_size);
     input->size = size;
-    input->steps = 100;
+    input->steps = steps;
     memset(&input->array[0], '0', size * size);        
     input->array[3] = '1';
     input->array[4] = '1';
@@ -945,6 +974,11 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
     printf("pp_att_result_msg pointer: %d\n", *pp_att_result_msg);*/
 
     fprintf(stderr, "Assignment Done.\n");
+
+    
+    // update counter
+    counter += steps;
+
 
     return 0;
 }
