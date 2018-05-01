@@ -172,8 +172,8 @@ int sp_ra_proc_msg0_req(const sample_ra_msg0_t *p_msg0,
 
 // Verify message 1 then generate and return message 2 to isv.
 int sp_ra_proc_msg1_req(const sample_ra_msg1_t *p_msg1,
-						uint32_t msg1_size,
-						ra_samp_response_header_t **pp_msg2)
+                        uint32_t msg1_size,
+                        ra_samp_response_header_t **pp_msg2)
 {
     int ret = 0;
     ra_samp_response_header_t* p_msg2_full = NULL;
@@ -835,21 +835,20 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
 
     // init p_att_result_msg_full (header + payload)
     p_att_result_msg_full = (ra_samp_response_header_t*)malloc(
-        sizeof(sample_ra_att_result_msg_t) + sizeof(ra_samp_response_header_t) + msg_size
+        sizeof(ra_samp_response_header_t) + msg_size
     );
     memset(p_att_result_msg_full, 0, 
-        sizeof(sample_ra_att_result_msg_t) + sizeof(ra_samp_response_header_t) + msg_size
+        sizeof(ra_samp_response_header_t) + msg_size
     );
 
     p_att_result_msg_full->type = 6;
-    p_att_result_msg_full->size = sizeof(sample_ra_att_result_msg_t) +  msg_size;
+    p_att_result_msg_full->size = msg_size;
+    printf("MESSAGE SIZE: %d\n", p_att_result_msg_full->size);
 
     // link p_att_result_msg_full with p_att_result_msg (only payload)
     p_att_result_msg = (sample_ra_att_result_msg_t *)p_att_result_msg_full->body;
 
 
-
-    printf("p_att_result_msg pointer: %d\n", p_att_result_msg);
 
 
 
@@ -862,8 +861,8 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
         &global_key,
         (uint8_t*) input,
         msg_size,
-        //(uint8_t*) (p_att_result_msg)+sizeof(ra_samp_response_header_t),
-        p_att_result_msg->secret.payload,
+        (uint8_t*) (p_att_result_msg),
+        //p_att_result_msg->secret.payload,
         &aes_gcm_iv[0],
         SAMPLE_SP_IV_SIZE,
         NULL,
