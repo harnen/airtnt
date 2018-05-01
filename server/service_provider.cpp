@@ -751,7 +751,11 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
         printf("\n");
         
 
-
+        fprintf(stderr, "ENC KEY:\n");
+        for (int i = 0; i < sizeof(sample_aes_gcm_128bit_key_t); ++i)
+        {
+            fprintf(stderr, "%d\n", g_sp_db.sk_key[i]);
+        }
 
         // copy to global
         memcpy(global_key, g_sp_db.sk_key, sizeof(sample_aes_gcm_128bit_key_t));
@@ -854,14 +858,18 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
     printf("Created an input message. Size: %lu\n", msg_size);
     for(int i = 0; i < msg_size; i++){
         //printf("%c ", input->array[i*size + j]);
-        printf("%d ", (uint8_t)input[i]);
+        printf("%c ", (uint8_t)input[i]);
     } 
      printf("\n");
 
 
     uint8_t aes_gcm_iv[SAMPLE_SP_IV_SIZE] = {0};
 
-    fprintf(stderr, "Encryption TODO.\n");
+    fprintf(stderr, "ENC KEY:\n");
+    for (int i = 0; i < sizeof(sample_aes_gcm_128bit_key_t); ++i)
+    {
+        fprintf(stderr, "%d\n", global_key[i]);
+    }
     
     ret = sample_rijndael128GCM_encrypt(
         &global_key,
