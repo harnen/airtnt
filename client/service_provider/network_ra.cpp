@@ -52,7 +52,7 @@
 
 // @return int
 
-#define MAX_BUF_SIZE 2048
+#define MAX_BUF_SIZE 20000
 
 using boost::asio::ip::tcp;
 boost::asio::io_context io_context;
