@@ -743,6 +743,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
                         &p_att_result_msg->secret.payload_tag);
         }
 
+        printf("Printing size: %d\n", msg_size);
         printf("Printing payload:\n");
         for (int i = 0; i < msg_size; ++i) {
             printf("%d ", p_att_result_msg->secret.payload[i]);
@@ -849,6 +850,14 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
     p_att_result_msg = (sample_ra_att_result_msg_t *)p_att_result_msg_full->body;
 
 
+    // printing input
+    printf("Created an input message. Size: %lu\n", msg_size);
+    for(int i = 0; i < size; i++){
+        for(int j = 0; j < size; j++){
+            printf("%c ", input->array[i*size + j]);
+        }
+        printf("\n");
+    } 
 
 
 
