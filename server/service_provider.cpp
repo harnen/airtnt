@@ -449,7 +449,7 @@ int sp_ra_proc_msg1_req(const sample_ra_msg1_t *p_msg1,
 // Process remote attestation message 3
 int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
                         uint32_t msg3_size,
-                        ra_samp_response_header_t **pp_att_result_msg)
+                        ra_samp_response_header_t **pp_att_result_msg, int steps)
 {
 
     int ret = 0;
@@ -725,7 +725,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
     
         life_input_t* input = (life_input_t*) malloc(msg_size);
         input->size = size;
-        input->steps = 100;
+        input->steps = steps;
         memset(&input->array[0], '0', size * size);        
         input->array[3] = '1';
         input->array[4] = '1';
@@ -1025,6 +1025,7 @@ int sp_ra_proc_msg_input_req(const sample_ra_msg_input_t *p_msg3, uint32_t msg3_
 
     printf("We don't wanna see this\n");
     return 0;
+    /*
     int ret = 0;
     sample_status_t sample_ret = SAMPLE_SUCCESS;
     const uint8_t *p_msg3_cmaced = NULL;
@@ -1068,6 +1069,7 @@ int sp_ra_proc_msg_input_req(const sample_ra_msg_input_t *p_msg3, uint32_t msg3_
         } 
 
         uint8_t aes_gcm_iv[SAMPLE_SP_IV_SIZE] = {0};
+        */
         /*
         p_att_result_msg->secret.payload_size = msg_size;
         if((IAS_QUOTE_OK == attestation_report.status) &&
@@ -1075,6 +1077,7 @@ int sp_ra_proc_msg_input_req(const sample_ra_msg_input_t *p_msg3, uint32_t msg3_
            (isv_policy_passed == true))
         {
         */
+
             ret = sample_rijndael128GCM_encrypt(&g_sp_db.sk_key,
                         (uint8_t*) input,
                         msg_size,
