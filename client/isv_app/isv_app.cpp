@@ -672,7 +672,8 @@ int main(int argc, char* argv[])
         memcpy(buffer, p_att_result_msg_body->secret.payload, p_att_result_msg_body->secret.payload_size);
         uint8_t* result = (uint8_t*) malloc(p_att_result_msg_body->secret.payload_size);
 
-        struct timeval t_started, t_stopped, t_diff, t_sum;
+        struct timeval t_started, t_stopped;
+        unsigned long m_sum = 0;
  
         int counter = 0;       
         if(attestation_passed)
@@ -693,6 +694,7 @@ int main(int argc, char* argv[])
                 sgx_aes_gcm_128bit_tag_t out_mac;
 
                 gettimeofday(&t_started,NULL);
+                unsigned long m_started = 1000000 * t_started.tv_sec + t_started.tv_usec;
                 ret = put_secret_data(enclave_id,
                                   &status,
                                   context,
@@ -705,8 +707,8 @@ int main(int argc, char* argv[])
                                   &out_mac);
                 
                 gettimeofday(&t_stopped,NULL);
-                timersub(&t_stopped, &t_started, &t_diff);
-                timeradd(&t_sum, &t_diff, &t_sum);
+                unsigned long m_stopped = 1000000 * t_stopped.tv_sec + t_stopped.tv_usec;
+                m_sum += m_stopped - m_started;
 
                 //send back the result
                 uint32_t output_size = p_att_result_msg_body->secret.payload_size; //we assume that input is the same as output
@@ -739,7 +741,7 @@ int main(int argc, char* argv[])
                 PRINT("Counter %d\n", counter++);
             }while(1);
 
-            printf("Time spent in the enclave %lu [ms]\n", 1000000 * t_sum.tv_sec + t_sum.tv_usec);
+            printf("Time spent in the enclave %lu [us]\n", m_sum);
             free(result);
             free (p_msg_reply);
             free(buffer);
