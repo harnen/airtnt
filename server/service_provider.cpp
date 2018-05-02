@@ -849,7 +849,7 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
     #endif
 
 
-    if (counter > max_iterations) {
+    if (counter >= max_iterations) {
 
         // init resp buffers
         uint8_t* rep_buffer = (uint8_t*) malloc(
