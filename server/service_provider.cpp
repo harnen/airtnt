@@ -44,6 +44,7 @@
 #include <string.h>
 #include "ias_ra.h"
 
+#include "misc.h"
 
 
 #ifndef SAFE_FREE
@@ -600,6 +601,8 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
             break;
         }
         FILE* OUTPUT = stdout;
+
+        #ifdef MYDEBUG 
         fprintf(OUTPUT, "\n\n\tAttestation Report:");
         fprintf(OUTPUT, "\n\tid: 0x%0x.", attestation_report.id);
         fprintf(OUTPUT, "\n\tstatus: %d.", attestation_report.status);
@@ -611,6 +614,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
         // implementation, the attestation server could only send the PIB for certain attestation 
         // report statuses.  A product SP implementation needs to handle cases
         // where the PIB is zero length.
+        #endif    
 
         // Respond the client with the results of the attestation.
         uint32_t att_result_msg_size = sizeof(sample_ra_att_result_msg_t);
@@ -645,7 +649,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
         // The platform_info_blob signature will be verified by the client
         // when sent. No need to have the Service Provider to check it.  The SP
         // should pass it down to the application for further analysis.
-
+        #ifdef MYDEBUG 
         fprintf(OUTPUT, "\n\n\tEnclave Report:");
         fprintf(OUTPUT, "\n\tSignature Type: 0x%x", p_quote->sign_type);
         fprintf(OUTPUT, "\n\tSignature Basename: ");
@@ -654,7 +658,9 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
         {
             fprintf(OUTPUT, "%c", p_quote->basename.name[i]);
         }
+            
 #ifdef __x86_64__
+
         fprintf(OUTPUT, "\n\tattributes.flags: 0x%0lx",
                 p_quote->report_body.attributes.flags);
         fprintf(OUTPUT, "\n\tattributes.xfrm: 0x%0lx",
@@ -687,6 +693,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
                 p_quote->report_body.isv_prod_id);
         fprintf(OUTPUT, "\n\tisv_svn: 0x%0x",p_quote->report_body.isv_svn);
         fprintf(OUTPUT, "\n");
+        #endif 
 
         // A product service provider needs to verify that its enclave properties 
         // match what is expected.  The SP needs to check these values before
@@ -724,6 +731,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
         input->array[4] = '1';
         input->array[5] = '1';
 
+        #ifdef MYDEBUG 
         printf("Created an input message. Size: %lu\n", msg_size);
         for(int i = 0; i < size; i++){
             for(int j = 0; j < size; j++){
@@ -731,6 +739,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
             }
             printf("\n");
         } 
+        #endif
 
         uint8_t aes_gcm_iv[SAMPLE_SP_IV_SIZE] = {0};
         p_att_result_msg->secret.payload_size = msg_size;
@@ -749,6 +758,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
                         &p_att_result_msg->secret.payload_tag);
         }
 
+        #ifdef MYDEBUG 
         printf("Printing size: %d\n", msg_size);
         printf("Printing payload:\n");
         for (int i = 0; i < msg_size; ++i) {
@@ -763,6 +773,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
             fprintf(stderr, "%d", g_sp_db.sk_key[i]);
         }
         printf("\n");
+        #endif
 
         // copy to global
         memcpy(global_key, g_sp_db.sk_key, sizeof(sample_aes_gcm_128bit_key_t));
@@ -789,7 +800,9 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
 {
 
     uint8_t iv[12] = {0};
-    printf("Got output size: %d\n", output_size); 
+    #ifdef MYDEBUG 
+    printf("Got output size: %d\n", output_size);
+    #endif 
     uint8_t buf[output_size];
 
     sample_ec_key_128bit_t random_key;
@@ -827,11 +840,13 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
                         0,
                         NULL);
    
+    #ifdef MYDEBUG 
     printf("Decrypted on service provider: ");
     for(int i = 0; i < 16; i++){
         printf("%d,", decrypted[i]);
     }
     printf("\n");
+    #endif
 
 
     if (counter > max_iterations) {
@@ -881,28 +896,35 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
 
     rep_header->type = 6;
     rep_header->size = msg_size;
+
+    #ifdef MYDEBUG 
     printf("MESSAGE SIZE: %d\n", rep_header->size);
+    #endif 
 
 
 
     uint8_t* tmp = (uint8_t*) input;
     // printing input
+    #ifdef MYDEBUG 
     printf("Created an input message. Size: %lu\n", msg_size);
     for(int i = 0; i < msg_size; i++){
         //printf("%c ", input->array[i*size + j]);
         printf("%d ", tmp[i]);
     } 
-     printf("\n");
+    printf("\n");
+    #endif
 
 
     uint8_t aes_gcm_iv[SAMPLE_SP_IV_SIZE] = {0};
 
+    #ifdef MYDEBUG 
     fprintf(stderr, "ENC KEY:\n");
     for (int i = 0; i < sizeof(sample_aes_gcm_128bit_key_t); ++i)
     {
         fprintf(stderr, "%d", global_key[i]);
     }
     printf("\n");
+    #endif
     uint8_t* ebuf =  (uint8_t*) malloc (msg_size); //(uint8_t*) p_att_result_msg;
 
     /*
@@ -946,15 +968,19 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
         NULL
     );
 
+    #ifdef MYDEBUG 
     printf("Test dect: \n");
     for (int i = 0; i < msg_size; ++i)
     {
         printf("%d ", buf_test[i]);
     }
     printf("\n");
+    #endif
 
 
     memcpy(rep_buffer + sizeof(ra_samp_response_header_t), ebuf, msg_size);
+
+    #ifdef MYDEBUG 
     printf("Printing payload:\n");
         for (int i = 0; i < msg_size; ++i) {
             printf("%d ", rep_buffer[i]);//p_att_result_msg[i]);
@@ -965,16 +991,21 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
             printf("%d ", ebuf[i]);//p_att_result_msg[i]);
         }
         printf("\n");
+    #endif
+
     free(input);
     
+    #ifdef MYDEBUG 
     fprintf(stderr, "Encryption Done.\n");
+    #endif
 
     *pp_att_result_msg = (ra_samp_response_header_t*) rep_buffer;
 /*    printf("p_att_result_msg pointer: %d\n", p_att_result_msg);
     printf("pp_att_result_msg pointer: %d\n", *pp_att_result_msg);*/
 
+    #ifdef MYDEBUG 
     fprintf(stderr, "Assignment Done.\n");
-
+    #endif
     
     // update counter
     counter += steps;
