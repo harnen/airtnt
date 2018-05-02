@@ -1025,7 +1025,7 @@ int sp_ra_proc_msg_input_req(const sample_ra_msg_input_t *p_msg3, uint32_t msg3_
 
     printf("We don't wanna see this\n");
     return 0;
-    /*
+   
     int ret = 0;
     sample_status_t sample_ret = SAMPLE_SUCCESS;
     const uint8_t *p_msg3_cmaced = NULL;
@@ -1069,7 +1069,7 @@ int sp_ra_proc_msg_input_req(const sample_ra_msg_input_t *p_msg3, uint32_t msg3_
         } 
 
         uint8_t aes_gcm_iv[SAMPLE_SP_IV_SIZE] = {0};
-        */
+      
         /*
         p_att_result_msg->secret.payload_size = msg_size;
         if((IAS_QUOTE_OK == attestation_report.status) &&
