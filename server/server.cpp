@@ -14,6 +14,8 @@
 #include <utility>
 #include <boost/asio.hpp>
 
+#include "misc.h"
+
 #include "chat_message.hpp"
 using boost::asio::ip::tcp;
 
@@ -64,8 +66,11 @@ void session(tcp::socket sock)
       }
       */
       ra_samp_request_header_t *header = (ra_samp_request_header_t*) data;
+
+      #ifdef MYDEBUG 
       printf("Received size: %d\n", header->size);
       printf("Received type: %d\n", header->type);
+      #endif
         
 
       sock.read_some(boost::asio::buffer(data+sizeof(*header), header->size), error);
@@ -105,10 +110,12 @@ void session(tcp::socket sock)
         max_iterations
       );
 
+      #ifdef MYDEBUG 
       printf("p_att_result_msg pointer: %d\n", p_msg0_resp_full);
 
       printf("Response size: %d\n", p_msg0_resp_full->size);
       printf("Response type: %d\n", p_msg0_resp_full->type);
+      #endif 
 
       if((!p_msg0_resp_full->size) && (p_msg0_resp_full->type == 6)){
         gettimeofday(&t_finished,NULL);
