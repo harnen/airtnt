@@ -130,7 +130,6 @@ int ra_network_send_receive(const char *server_url,
     }else{
         PRINT("Nothing else to read\n");
         if(reply_header->type == 6){
-            s.close();
             return 1;
         }
         return 0;

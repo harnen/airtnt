@@ -119,12 +119,6 @@ void session(tcp::socket sock)
       printf("Response type: %d\n", p_msg0_resp_full->type);
       #endif 
 
-      if((!p_msg0_resp_full->size) && (p_msg0_resp_full->type == 6)){
-        gettimeofday(&t_finished,NULL);
-        unsigned long m_finished = 1000000 * t_finished.tv_sec + t_finished.tv_usec;
-        printf("Time connected [us] %lu, time finished [us] %lu, time diff [us] %lu, iterations %d\n", m_connected, m_finished, m_finished - m_connected, iter_counter);
-        return;
-      }
 
       ////////////////////////////////
       // END EDIT
@@ -138,6 +132,12 @@ void session(tcp::socket sock)
         sizeof(ra_samp_response_header_t) + p_msg0_resp_full->size)
       );
 
+      if((!p_msg0_resp_full->size) && (p_msg0_resp_full->type == 6)){
+        gettimeofday(&t_finished,NULL);
+        unsigned long m_finished = 1000000 * t_finished.tv_sec + t_finished.tv_usec;
+        printf("Time connected [us] %lu, time finished [us] %lu, time diff [us] %lu, iterations %d\n", m_connected, m_finished, m_finished - m_connected, iter_counter);
+        return;
+      }
       ////////////////////////////////
       // EDIT
       ////////////////////////////////
