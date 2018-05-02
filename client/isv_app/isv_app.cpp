@@ -57,7 +57,7 @@
 
 #include "service_provider.h"
 #include "misc.h"
-
+#include <sys/time.h>
 
 
 #ifndef SAFE_FREE
@@ -671,6 +671,9 @@ int main(int argc, char* argv[])
         uint8_t* buffer = (uint8_t*)  malloc(p_att_result_msg_body->secret.payload_size);
         memcpy(buffer, p_att_result_msg_body->secret.payload, p_att_result_msg_body->secret.payload_size);
         uint8_t* result = (uint8_t*) malloc(p_att_result_msg_body->secret.payload_size);
+
+        struct timeval t_started, t_stopped;
+        unsigned long m_sum = 0;
  
         int counter = 0;       
         if(attestation_passed)
@@ -690,6 +693,8 @@ int main(int argc, char* argv[])
 
                 sgx_aes_gcm_128bit_tag_t out_mac;
 
+                gettimeofday(&t_started,NULL);
+                unsigned long m_started = 1000000 * t_started.tv_sec + t_started.tv_usec;
                 ret = put_secret_data(enclave_id,
                                   &status,
                                   context,
@@ -700,6 +705,10 @@ int main(int argc, char* argv[])
                                   &result_size,
                                   &result_key,
                                   &out_mac);
+                
+                gettimeofday(&t_stopped,NULL);
+                unsigned long m_stopped = 1000000 * t_stopped.tv_sec + t_stopped.tv_usec;
+                m_sum += m_stopped - m_started;
 
                 //send back the result
                 uint32_t output_size = p_att_result_msg_body->secret.payload_size; //we assume that input is the same as output
@@ -720,7 +729,7 @@ int main(int argc, char* argv[])
                 int rett = ra_network_send_receive("http://SampleServiceProvider.intel.com/",
                                         p_msg_result,
                                         (ra_samp_response_header_t**) &p_msg_reply); //TODO: Change it - for now, we don't assume any response
-
+                //free(p_msg_result);
 
                 if(rett){ret = 0;  break;}
                 PRINT("Received network buffer (%d): ", p_att_result_msg_body->secret.payload_size);
@@ -732,6 +741,7 @@ int main(int argc, char* argv[])
                 PRINT("Counter %d\n", counter++);
             }while(1);
 
+            printf("Time spent in the enclave %lu [us]\n", m_sum);
             free(result);
             free (p_msg_reply);
             free(buffer);

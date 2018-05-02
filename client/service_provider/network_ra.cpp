@@ -91,6 +91,7 @@ int ra_network_send_receive(const char *server_url,
     }
 
     if(!connected){
+//        int result = connect("ec2-35-177-186-97.eu-west-2.compute.amazonaws.com", "8000");
         int result = connect("localhost", "8000");
         if(result) return -1;
     }
@@ -130,7 +131,6 @@ int ra_network_send_receive(const char *server_url,
     }else{
         PRINT("Nothing else to read\n");
         if(reply_header->type == 6){
-            s.close();
             return 1;
         }
         return 0;

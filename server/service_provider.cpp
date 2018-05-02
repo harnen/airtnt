@@ -850,6 +850,7 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
     printf("\n");
     #endif
 
+    //fprintf(stderr, "counter %d, max %d, steps %d\n", counter, max_iterations, steps);
 
     if (counter >= max_iterations) {
 
@@ -871,7 +872,6 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
 
         return 0;
     }
-
 
     life_input_t* input = (life_input_t*) malloc(msg_size);
     input->size = size;
