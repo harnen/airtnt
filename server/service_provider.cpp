@@ -778,6 +778,8 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
         // copy to global
         memcpy(global_key, g_sp_db.sk_key, sizeof(sample_aes_gcm_128bit_key_t));
 
+        counter += steps;
+
 
     }while(0);
 
