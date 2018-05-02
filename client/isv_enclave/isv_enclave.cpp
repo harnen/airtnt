@@ -448,6 +448,8 @@ sgx_status_t put_secret_data(
                                     0,
                                     out_mac);
 
+        free(g_secret);
+
     } while(0);
     return ret;
 }
