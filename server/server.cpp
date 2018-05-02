@@ -114,6 +114,7 @@ void session(tcp::socket sock)
         gettimeofday(&t_finished,NULL);
         unsigned long m_finished = 1000000 * t_finished.tv_sec + t_finished.tv_usec;
         printf("Time connected [us] %lu, time finished [us] %lu, time diff [us] %lu\n", m_connected, m_finished, m_finished - m_connected);
+        return;
       }
 
       ////////////////////////////////

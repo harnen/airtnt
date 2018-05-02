@@ -56,6 +56,9 @@
 #include "sgx_uae_service.h"
 
 #include "service_provider.h"
+#include "misc.h"
+
+
 
 #ifndef SAFE_FREE
 #define SAFE_FREE(ptr) {if (NULL != (ptr)) {free(ptr); (ptr) = NULL;}}
@@ -191,6 +194,7 @@ int main(int argc, char* argv[])
 
     FILE* OUTPUT = stdout;
 
+    PRINT("First test!\n");
 #define VERIFICATION_INDEX_IS_VALID() (verify_index > 0 && \
                                        verify_index <= verification_samples)
 #define GET_VERIFICATION_ARRAY_INDEX() (verify_index-1)
