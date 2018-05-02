@@ -40,7 +40,7 @@
 #include <boost/asio.hpp>
 #include <iostream>
 #include "chat_message.hpp"
-
+#include "../isv_app/misc.h"
 // Used to send requests to the service provider sample.  It
 // simulates network communication between the ISV app and the
 // ISV service provider.  This would be modified in a real
@@ -94,7 +94,7 @@ int ra_network_send_receive(const char *server_url,
         int result = connect("localhost", "8000");
         if(result) return -1;
     }
-    printf("Connected to the server\n");
+    PRINT("Connected to the server\n");
     
 
     int wrote = 0;
@@ -103,32 +103,32 @@ int ra_network_send_receive(const char *server_url,
                                boost::asio::buffer(p_req, 
                                p_req->size + sizeof (ra_samp_request_header_t)));
 
-    printf("Wrote %d bytes of Msg %d\n", wrote, p_req->type);
+    PRINT("Wrote %d bytes of Msg %d\n", wrote, p_req->type);
 
     if (wrote != (p_req->size + sizeof (ra_samp_request_header_t)))
     {
-        fprintf(stderr, "\nError, sending the message [%s].",
+        PRINT("\nError, sending the message [%s].",
                 __FUNCTION__);
         ret = -1;
     }else{
-        printf("Msg %d success\n", p_req->type);
+        PRINT("Msg %d success\n", p_req->type);
     }
 
     read = boost::asio::read(s,
                              boost::asio::buffer(reply, sizeof(ra_samp_response_header_t)));
-    printf("Read %d bytes \n", read);
+    PRINT("Read %d bytes \n", read);
 
     ra_samp_response_header_t* reply_header = (ra_samp_response_header_t*) reply;
-    printf("Received a header, size: %d, type: %d\n", reply_header->size, reply_header->type);
+    PRINT("Received a header, size: %d, type: %d\n", reply_header->size, reply_header->type);
 
     if(reply_header->size > 0){
-        printf("Reading the rest of the message\n");
+        PRINT("Reading the rest of the message\n");
         read = boost::asio::read(s,
                                  boost::asio::buffer(reply + sizeof(ra_samp_response_header_t), reply_header->size)); 
         *p_resp = (ra_samp_response_header_t*) reply;
-        printf("Setting the response pointer to %d\n", reply);
+        PRINT("Setting the response pointer to %d\n", reply);
     }else{
-        printf("Nothing else to read\n");
+        PRINT("Nothing else to read\n");
     }
 
 /*    case TYPE_RA_MSG1:

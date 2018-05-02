@@ -87,19 +87,19 @@ void PRINT_BYTE_ARRAY(
 {
     if(!mem || !len)
     {
-        fprintf(file, "\n( null )\n");
+        PRINT( "\n( null )\n");
         return;
     }
     uint8_t *array = (uint8_t *)mem;
-    fprintf(file, "%u bytes:\n{\n", len);
+    PRINT( "%u bytes:\n{\n", len);
     uint32_t i = 0;
     for(i = 0; i < len - 1; i++)
     {
-        fprintf(file, "0x%x, ", array[i]);
-        if(i % 8 == 7) fprintf(file, "\n");
+        PRINT( "0x%x, ", array[i]);
+        if(i % 8 == 7) PRINT( "\n");
     }
-    fprintf(file, "0x%x ", array[i]);
-    fprintf(file, "\n}\n");
+    PRINT( "0x%x ", array[i]);
+    PRINT( "\n}\n");
 }
 
 
@@ -109,37 +109,37 @@ void PRINT_ATTESTATION_SERVICE_RESPONSE(
 {
     if(!response)
     {
-        fprintf(file, "\t\n( null )\n");
+        PRINT( "\t\n( null )\n");
         return;
     }
 
-    fprintf(file, "RESPONSE TYPE:   0x%x\n", response->type);
-    fprintf(file, "RESPONSE STATUS: 0x%x 0x%x\n", response->status[0],
+    PRINT( "RESPONSE TYPE:   0x%x\n", response->type);
+    PRINT( "RESPONSE STATUS: 0x%x 0x%x\n", response->status[0],
             response->status[1]);
-    fprintf(file, "RESPONSE BODY SIZE: %u\n", response->size);
+    PRINT( "RESPONSE BODY SIZE: %u\n", response->size);
 
     if(response->type == TYPE_RA_MSG2)
     {
         sgx_ra_msg2_t* p_msg2_body = (sgx_ra_msg2_t*)(response->body);
 
-        fprintf(file, "MSG2 gb - ");
+        PRINT( "MSG2 gb - ");
         PRINT_BYTE_ARRAY(file, &(p_msg2_body->g_b), sizeof(p_msg2_body->g_b));
 
-        fprintf(file, "MSG2 spid - ");
+        PRINT( "MSG2 spid - ");
         PRINT_BYTE_ARRAY(file, &(p_msg2_body->spid), sizeof(p_msg2_body->spid));
 
-        fprintf(file, "MSG2 quote_type : %hx\n", p_msg2_body->quote_type);
+        PRINT( "MSG2 quote_type : %hx\n", p_msg2_body->quote_type);
 
-        fprintf(file, "MSG2 kdf_id : %hx\n", p_msg2_body->kdf_id);
+        PRINT( "MSG2 kdf_id : %hx\n", p_msg2_body->kdf_id);
 
-        fprintf(file, "MSG2 sign_gb_ga - ");
+        PRINT( "MSG2 sign_gb_ga - ");
         PRINT_BYTE_ARRAY(file, &(p_msg2_body->sign_gb_ga),
                          sizeof(p_msg2_body->sign_gb_ga));
 
-        fprintf(file, "MSG2 mac - ");
+        PRINT( "MSG2 mac - ");
         PRINT_BYTE_ARRAY(file, &(p_msg2_body->mac), sizeof(p_msg2_body->mac));
 
-        fprintf(file, "MSG2 sig_rl - ");
+        PRINT( "MSG2 sig_rl - ");
         PRINT_BYTE_ARRAY(file, &(p_msg2_body->sig_rl),
                          p_msg2_body->sig_rl_size);
     }
@@ -147,23 +147,23 @@ void PRINT_ATTESTATION_SERVICE_RESPONSE(
     {
         sample_ra_att_result_msg_t *p_att_result =
             (sample_ra_att_result_msg_t *)(response->body);
-        fprintf(file, "ATTESTATION RESULT MSG platform_info_blob - ");
+        PRINT( "ATTESTATION RESULT MSG platform_info_blob - ");
         PRINT_BYTE_ARRAY(file, &(p_att_result->platform_info_blob),
                          sizeof(p_att_result->platform_info_blob));
 
-        fprintf(file, "ATTESTATION RESULT MSG mac - ");
+        PRINT( "ATTESTATION RESULT MSG mac - ");
         PRINT_BYTE_ARRAY(file, &(p_att_result->mac), sizeof(p_att_result->mac));
 
-        fprintf(file, "ATTESTATION RESULT MSG secret.payload_tag - %u bytes\n",
+        PRINT( "ATTESTATION RESULT MSG secret.payload_tag - %u bytes\n",
                 p_att_result->secret.payload_size);
 
-        fprintf(file, "ATTESTATION RESULT MSG secret.payload - ");
+        PRINT( "ATTESTATION RESULT MSG secret.payload - ");
         PRINT_BYTE_ARRAY(file, p_att_result->secret.payload,
                 p_att_result->secret.payload_size);
     }
     else
     {
-        fprintf(file, "\nERROR in printing out the response. "
+        PRINT( "\nERROR in printing out the response. "
                        "Response of type not supported %d\n", response->type);
     }
 }
@@ -206,17 +206,17 @@ int main(int argc, char* argv[])
 
         if( VERIFICATION_INDEX_IS_VALID())
         {
-            fprintf(OUTPUT, "\nVerifying precomputed attestation messages "
+            PRINT( "\nVerifying precomputed attestation messages "
                             "using precomputed values# %d\n", verify_index);
         }
         else
         {
-            fprintf(OUTPUT, "\nValid invocations are:\n");
-            fprintf(OUTPUT, "\n\tisv_app\n");
-            fprintf(OUTPUT, "\n\tisv_app <verification index>\n");
-            fprintf(OUTPUT, "\nValid indices are [1 - %d]\n",
+            PRINT( "\nValid invocations are:\n");
+            PRINT( "\n\tisv_app\n");
+            PRINT( "\n\tisv_app <verification index>\n");
+            PRINT( "\nValid indices are [1 - %d]\n",
                     verification_samples);
-            fprintf(OUTPUT, "\nUsing a verification index uses precomputed "
+            PRINT( "\nUsing a verification index uses precomputed "
                     "messages to assist debugging the remote attestation "
                     "service provider.\n");
             return -1;
@@ -230,11 +230,11 @@ int main(int argc, char* argv[])
         if (SGX_SUCCESS != ret)
         {
             ret = -1;
-            fprintf(OUTPUT, "\nError, call sgx_get_extended_epid_group_id fail [%s].",
+            PRINT( "\nError, call sgx_get_extended_epid_group_id fail [%s].",
                 __FUNCTION__);
             return ret;
         }
-        fprintf(OUTPUT, "\nCall sgx_get_extended_epid_group_id success.");
+        PRINT( "\nCall sgx_get_extended_epid_group_id success.");
 
         p_msg0_full = (ra_samp_request_header_t*)
             malloc(sizeof(ra_samp_request_header_t)
@@ -250,25 +250,25 @@ int main(int argc, char* argv[])
         *(uint32_t*)((uint8_t*)p_msg0_full + sizeof(ra_samp_request_header_t)) = extended_epid_group_id;
         {
 
-            fprintf(OUTPUT, "\nMSG0 body generated -\n");
+            PRINT( "\nMSG0 body generated -\n");
 
             PRINT_BYTE_ARRAY(OUTPUT, p_msg0_full->body, p_msg0_full->size);
 
         }
         // The ISV application sends msg0 to the SP.
         // The ISV decides whether to support this extended epid group id.
-        fprintf(OUTPUT, "\nSending msg0 to remote attestation service provider.\n");
+        PRINT( "\nSending msg0 to remote attestation service provider.\n");
 
         ret = ra_network_send_receive("http://SampleServiceProvider.intel.com/",
             p_msg0_full,
             &p_msg0_resp_full);
         if (ret != 0)
         {
-            fprintf(OUTPUT, "\nError, ra_network_send_receive for msg0 failed "
+            PRINT( "\nError, ra_network_send_receive for msg0 failed "
                 "[%s].", __FUNCTION__);
             goto CLEANUP;
         }
-        fprintf(OUTPUT, "\nSent MSG0 to remote attestation service.\n");
+        PRINT( "\nSent MSG0 to remote attestation service.\n");
     }
     // Remote attestation will be initiated the ISV server challenges the ISV
     // app or if the ISV app detects it doesn't have the credentials
@@ -289,11 +289,11 @@ int main(int argc, char* argv[])
             if(SGX_SUCCESS != ret)
             {
                 ret = -1;
-                fprintf(OUTPUT, "\nError, call sgx_create_enclave fail [%s].",
+                PRINT( "\nError, call sgx_create_enclave fail [%s].",
                         __FUNCTION__);
                 goto CLEANUP;
             }
-            fprintf(OUTPUT, "\nCall sgx_create_enclave success.");
+            PRINT( "\nCall sgx_create_enclave success.");
 
             ret = enclave_init_ra(enclave_id,
                                   &status,
@@ -305,11 +305,11 @@ int main(int argc, char* argv[])
         if(SGX_SUCCESS != ret || status)
         {
             ret = -1;
-            fprintf(OUTPUT, "\nError, call enclave_init_ra fail [%s].",
+            PRINT( "\nError, call enclave_init_ra fail [%s].",
                     __FUNCTION__);
             goto CLEANUP;
         }
-        fprintf(OUTPUT, "\nCall enclave_init_ra success.");
+        PRINT( "\nCall enclave_init_ra success.");
 
         // isv application call uke sgx_ra_get_msg1
         p_msg1_full = (ra_samp_request_header_t*)
@@ -332,15 +332,15 @@ int main(int argc, char* argv[])
         if(SGX_SUCCESS != ret)
         {
             ret = -1;
-            fprintf(OUTPUT, "\nError, call sgx_ra_get_msg1 fail [%s].",
+            PRINT( "\nError, call sgx_ra_get_msg1 fail [%s].",
                     __FUNCTION__);
             goto CLEANUP;
         }
         else
         {
-            fprintf(OUTPUT, "\nCall sgx_ra_get_msg1 success.\n");
+            PRINT( "\nCall sgx_ra_get_msg1 success.\n");
 
-            fprintf(OUTPUT, "\nMSG1 body generated -\n");
+            PRINT( "\nMSG1 body generated -\n");
 
             PRINT_BYTE_ARRAY(OUTPUT, p_msg1_full->body, p_msg1_full->size);
 
@@ -353,7 +353,7 @@ int main(int argc, char* argv[])
                      msg1_samples[GET_VERIFICATION_ARRAY_INDEX()],
                      p_msg1_full->size);
 
-            fprintf(OUTPUT, "\nInstead of using the recently generated MSG1, "
+            PRINT( "\nInstead of using the recently generated MSG1, "
                             "we will use the following precomputed MSG1 -\n");
 
             PRINT_BYTE_ARRAY(OUTPUT, p_msg1_full->body, p_msg1_full->size);
@@ -363,7 +363,7 @@ int main(int argc, char* argv[])
         // The ISV application sends msg1 to the SP to get msg2,
         // msg2 needs to be freed when no longer needed.
         // The ISV decides whether to use linkable or unlinkable signatures.
-        fprintf(OUTPUT, "\nSending msg1 to remote attestation service provider."
+        PRINT( "\nSending msg1 to remote attestation service provider."
                         "Expecting msg2 back.\n");
 
 
@@ -373,13 +373,13 @@ int main(int argc, char* argv[])
 
         if(ret != 0 || !p_msg2_full)
         {
-            fprintf(OUTPUT, "\nError, ra_network_send_receive for msg1 failed "
+            PRINT( "\nError, ra_network_send_receive for msg1 failed "
                             "[%s].", __FUNCTION__);
             if(VERIFICATION_INDEX_IS_VALID())
             {
-                fprintf(OUTPUT, "\nBecause we are in verification mode we will "
+                PRINT( "\nBecause we are in verification mode we will "
                                 "ignore this error.\n");
-                fprintf(OUTPUT, "\nInstead, we will pretend we received the "
+                PRINT( "\nInstead, we will pretend we received the "
                                 "following MSG2 - \n");
 
                 SAFE_FREE(p_msg2_full);
@@ -414,12 +414,12 @@ int main(int argc, char* argv[])
             if(TYPE_RA_MSG2 != p_msg2_full->type)
             {
 
-                fprintf(OUTPUT, "\nError, didn't get MSG2 in response to MSG1. "
+                PRINT( "\nError, didn't get MSG2 in response to MSG1. "
                                 "[%s].", __FUNCTION__);
 
                 if(VERIFICATION_INDEX_IS_VALID())
                 {
-                    fprintf(OUTPUT, "\nBecause we are in verification mode we "
+                    PRINT( "\nBecause we are in verification mode we "
                                     "will ignore this error.");
                 }
                 else
@@ -428,13 +428,13 @@ int main(int argc, char* argv[])
                 }
             }
 
-            fprintf(OUTPUT, "\nSent MSG1 to remote attestation service "
+            PRINT( "\nSent MSG1 to remote attestation service "
                             "provider. Received the following MSG2:\n");
             PRINT_BYTE_ARRAY(OUTPUT, p_msg2_full,
                              sizeof(ra_samp_response_header_t)
                              + p_msg2_full->size);
 
-            fprintf(OUTPUT, "\nA more descriptive representation of MSG2:\n");
+            PRINT( "\nA more descriptive representation of MSG2:\n");
             PRINT_ATTESTATION_SERVICE_RESPONSE(OUTPUT, p_msg2_full);
 
             if( VERIFICATION_INDEX_IS_VALID() )
@@ -448,20 +448,20 @@ int main(int argc, char* argv[])
                     memcmp( precomputed_msg2, p_msg2_full,
                         sizeof(ra_samp_response_header_t) + p_msg2_full->size))
                 {
-                    fprintf(OUTPUT, "\nVerification ERROR. Our precomputed "
+                    PRINT( "\nVerification ERROR. Our precomputed "
                                     "value for MSG2 does NOT match.\n");
-                    fprintf(OUTPUT, "\nPrecomputed value for MSG2:\n");
+                    PRINT( "\nPrecomputed value for MSG2:\n");
                     PRINT_BYTE_ARRAY(OUTPUT, precomputed_msg2,
                                      sizeof(ra_samp_response_header_t)
                                      + precomputed_msg2->size);
-                    fprintf(OUTPUT, "\nA more descriptive representation "
+                    PRINT( "\nA more descriptive representation "
                                     "of precomputed value for MSG2:\n");
                     PRINT_ATTESTATION_SERVICE_RESPONSE(OUTPUT,
                                                        precomputed_msg2);
                 }
                 else
                 {
-                    fprintf(OUTPUT, "\nVerification COMPLETE. Remote "
+                    PRINT( "\nVerification COMPLETE. Remote "
                                     "attestation service provider generated a "
                                     "matching MSG2.\n");
                 }
@@ -487,7 +487,7 @@ int main(int argc, char* argv[])
             }
             memcpy_s(p_msg3, msg3_size,
                      msg3_samples[GET_VERIFICATION_ARRAY_INDEX()], msg3_size);
-            fprintf(OUTPUT, "\nBecause MSG1 was a precomputed value, the MSG3 "
+            PRINT( "\nBecause MSG1 was a precomputed value, the MSG3 "
                             "we use will also be. PRECOMPUTED MSG3 - \n");
         }
         else
@@ -508,22 +508,22 @@ int main(int argc, char* argv[])
             } while (SGX_ERROR_BUSY == ret && busy_retry_time--);
             if(!p_msg3)
             {
-                fprintf(OUTPUT, "\nError, call sgx_ra_proc_msg2 fail. "
+                PRINT( "\nError, call sgx_ra_proc_msg2 fail. "
                                 "p_msg3 = 0x%p [%s].", p_msg3, __FUNCTION__);
                 ret = -1;
                 goto CLEANUP;
             }
             if(SGX_SUCCESS != (sgx_status_t)ret)
             {
-                fprintf(OUTPUT, "\nError, call sgx_ra_proc_msg2 fail. "
+                PRINT( "\nError, call sgx_ra_proc_msg2 fail. "
                                 "ret = 0x%08x [%s].", ret, __FUNCTION__);
                 ret = -1;
                 goto CLEANUP;
             }
             else
             {
-                fprintf(OUTPUT, "\nCall sgx_ra_proc_msg2 success.\n");
-                fprintf(OUTPUT, "\nMSG3 - \n");
+                PRINT( "\nCall sgx_ra_proc_msg2 success.\n");
+                PRINT( "\nMSG3 - \n");
             }
         }
 
@@ -540,7 +540,7 @@ int main(int argc, char* argv[])
         p_msg3_full->size = msg3_size;
         if(memcpy_s(p_msg3_full->body, msg3_size, p_msg3, msg3_size))
         {
-            fprintf(OUTPUT,"\nError: INTERNAL ERROR - memcpy failed in [%s].",
+            PRINT("\nError: INTERNAL ERROR - memcpy failed in [%s].",
                     __FUNCTION__);
             ret = -1;
             goto CLEANUP;
@@ -560,7 +560,7 @@ int main(int argc, char* argv[])
         if(ret || !p_att_result_msg_full)
         {
             ret = -1;
-            fprintf(OUTPUT, "\nError, sending msg3 failed [%s].", __FUNCTION__);
+            PRINT( "\nError, sending msg3 failed [%s].", __FUNCTION__);
             goto CLEANUP;
         }
 
@@ -571,7 +571,7 @@ int main(int argc, char* argv[])
         if(TYPE_RA_ATT_RESULT != p_att_result_msg_full->type)
         {
             ret = -1;
-            fprintf(OUTPUT, "\nError. Sent MSG3 successfully, but the message "
+            PRINT( "\nError. Sent MSG3 successfully, but the message "
                             "received was NOT of type att_msg_result. Type = "
                             "%d. [%s].", p_att_result_msg_full->type,
                              __FUNCTION__);
@@ -579,7 +579,7 @@ int main(int argc, char* argv[])
         }
         else
         {
-            fprintf(OUTPUT, "\nSent MSG3 successfully. Received an attestation "
+            PRINT( "\nSent MSG3 successfully. Received an attestation "
                             "result message back\n.");
             if( VERIFICATION_INDEX_IS_VALID() )
             {
@@ -588,10 +588,10 @@ int main(int argc, char* argv[])
                         attestation_msg_samples[GET_VERIFICATION_ARRAY_INDEX()],
                         p_att_result_msg_full->size) )
                 {
-                    fprintf(OUTPUT, "\nSent MSG3 successfully. Received an "
+                    PRINT( "\nSent MSG3 successfully. Received an "
                                     "attestation result message back that did "
                                     "NOT match the expected value.\n");
-                    fprintf(OUTPUT, "\nEXPECTED ATTESTATION RESULT -");
+                    PRINT( "\nEXPECTED ATTESTATION RESULT -");
                     PRINT_BYTE_ARRAY(OUTPUT,
                         attestation_msg_samples[GET_VERIFICATION_ARRAY_INDEX()],
                         ATTESTATION_MSG_BODY_SIZE);
@@ -599,14 +599,14 @@ int main(int argc, char* argv[])
             }
         }
 
-        fprintf(OUTPUT, "\nATTESTATION RESULT RECEIVED - ");
+        PRINT( "\nATTESTATION RESULT RECEIVED - ");
         PRINT_BYTE_ARRAY(OUTPUT, p_att_result_msg_full->body,
                          p_att_result_msg_full->size);
 
 
         if( VERIFICATION_INDEX_IS_VALID() )
         {
-            fprintf(OUTPUT, "\nBecause we used precomputed values for the "
+            PRINT( "\nBecause we used precomputed values for the "
                             "messages, the attestation result message will "
                             "not pass further verification tests, so we will "
                             "skip them.\n");
@@ -629,7 +629,7 @@ int main(int argc, char* argv[])
            (SGX_SUCCESS != status))
         {
             ret = -1;
-            fprintf(OUTPUT, "\nError: INTEGRITY FAILED - attestation result "
+            PRINT( "\nError: INTEGRITY FAILED - attestation result "
                             "message MK based cmac failed in [%s].",
                             __FUNCTION__);
             goto CLEANUP;
@@ -644,7 +644,7 @@ int main(int argc, char* argv[])
         if(0 != p_att_result_msg_full->status[0]
            || 0 != p_att_result_msg_full->status[1])
         {
-            fprintf(OUTPUT, "\nError, attestation result message MK based cmac "
+            PRINT( "\nError, attestation result message MK based cmac "
                             "failed in [%s].", __FUNCTION__);
             attestation_passed = false;
         }
@@ -676,12 +676,12 @@ int main(int argc, char* argv[])
         if(attestation_passed)
         {
             do{
-                printf("Received msg size: %d\n", p_att_result_msg_body->secret.payload_size);
+                PRINT("Received msg size: %d\n", p_att_result_msg_body->secret.payload_size);
 
                 for(int i = 0; i < p_att_result_msg_body->secret.payload_size; i++){
-                    printf("%d,", buffer[i]);
+                    PRINT("%d,", buffer[i]);
                 }            
-                printf("\n");
+                PRINT("\n");
                 int result_size;
                 sgx_aes_gcm_128bit_key_t result_key;
                 for(int i =  0; i < SGX_AESGCM_KEY_SIZE; i++){
@@ -721,13 +721,13 @@ int main(int argc, char* argv[])
                                         p_msg_result,
                                         (ra_samp_response_header_t**) &p_msg_reply); //TODO: Change it - for now, we don't assume any response
 
-                printf("Received network buffer (%d): ", p_att_result_msg_body->secret.payload_size);
+                PRINT("Received network buffer (%d): ", p_att_result_msg_body->secret.payload_size);
                 for(int i = 0; i < sizeof(ra_samp_response_header_t) + p_att_result_msg_body->secret.payload_size; i++){
-                    printf("%d,", p_msg_reply[i]);
+                    PRINT("%d,", p_msg_reply[i]);
                 }
                 memcpy(buffer, (uint8_t*) p_msg_reply + sizeof(ra_samp_response_header_t), p_att_result_msg_body->secret.payload_size); 
 //                getchar();
-                printf("Counter %d\n", counter++);
+                PRINT("Counter %d\n", counter++);
             }while(1);
 
             free(result);
@@ -737,15 +737,15 @@ int main(int argc, char* argv[])
  
             if((SGX_SUCCESS != ret)  || (SGX_SUCCESS != status))
             {
-                fprintf(OUTPUT, "\nError, attestation result message secret "
+                PRINT( "\nError, attestation result message secret "
                                 "using SK based AESGCM failed in [%s]. ret = "
                                 "0x%0x. status = 0x%0x", __FUNCTION__, ret,
                                  status);
                 goto CLEANUP;
             }
         }
-        fprintf(OUTPUT, "\nSecret successfully received from server.");
-        fprintf(OUTPUT, "\nRemote attestation success!");
+        PRINT( "\nSecret successfully received from server.");
+        PRINT( "\nRemote attestation success!");
     }
 
 CLEANUP:
@@ -758,7 +758,7 @@ CLEANUP:
         if(SGX_SUCCESS != ret || status)
         {
             ret = -1;
-            fprintf(OUTPUT, "\nError, call enclave_ra_close fail [%s].",
+            PRINT( "\nError, call enclave_ra_close fail [%s].",
                     __FUNCTION__);
         }
         else
@@ -767,7 +767,7 @@ CLEANUP:
             // led us to this point in the code.
             ret = ret_save;
         }
-        fprintf(OUTPUT, "\nCall enclave_ra_close success.");
+        PRINT( "\nCall enclave_ra_close success.");
     }
 
     sgx_destroy_enclave(enclave_id);
@@ -782,7 +782,7 @@ CLEANUP:
     SAFE_FREE(p_msg3_full);
     SAFE_FREE(p_msg1_full);
     SAFE_FREE(p_msg0_full);
-    printf("\nEnter a character before exit ...\n");
+    PRINT("\nEnter a character before exit ...\n");
     getchar();
     return ret;
 }
