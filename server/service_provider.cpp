@@ -503,7 +503,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
         }
         // In real implementation, should use a time safe version of memcmp here,
         // in order to avoid side channel attack.
-        //ret = memcmp(&p_msg3->mac, mac, sizeof(mac));
+        ret = memcmp(&p_msg3->mac, mac, sizeof(mac));
         if(ret)
         {
             fprintf(stderr, "\nError, verify cmac fail [%s].", __FUNCTION__);
