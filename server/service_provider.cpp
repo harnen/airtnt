@@ -848,6 +848,7 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
     printf("\n");
     #endif
 
+    fprintf(stderr, "counter %d, max %d, steps %d\n", counter, max_iterations, steps);
 
     if (counter >= max_iterations) {
 
@@ -868,6 +869,8 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
         *pp_att_result_msg = (ra_samp_response_header_t*) rep_buffer;
 
         return 0;
+    }else{
+        fprintf(stderr, "Sending more input\n");
     }
 
 
