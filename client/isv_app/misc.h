@@ -1,3 +1,6 @@
+#ifndef MISC_H
+#define MISC_H
+
 #undef DEBUG
 //#define MYDEBUG 2
 #ifdef MYDEBUG
@@ -6,3 +9,5 @@
 #else
     #define PRINT(...) 
 #endif
+
+#endif /* MISC_H */

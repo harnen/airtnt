@@ -717,10 +717,12 @@ int main(int argc, char* argv[])
 
                 memcpy((uint8_t*)p_msg_result + sizeof(ra_samp_request_header_t), result, output_size);
 
-                ret = ra_network_send_receive("http://SampleServiceProvider.intel.com/",
+                int rett = ra_network_send_receive("http://SampleServiceProvider.intel.com/",
                                         p_msg_result,
                                         (ra_samp_response_header_t**) &p_msg_reply); //TODO: Change it - for now, we don't assume any response
 
+
+                if(rett){ret = 0;  break;}
                 PRINT("Received network buffer (%d): ", p_att_result_msg_body->secret.payload_size);
                 for(int i = 0; i < sizeof(ra_samp_response_header_t) + p_att_result_msg_body->secret.payload_size; i++){
                     PRINT("%d,", p_msg_reply[i]);

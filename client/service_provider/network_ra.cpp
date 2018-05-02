@@ -129,73 +129,13 @@ int ra_network_send_receive(const char *server_url,
         PRINT("Setting the response pointer to %d\n", reply);
     }else{
         PRINT("Nothing else to read\n");
+        if(reply_header->type == 6){
+            s.close();
+            return 1;
+        }
+        return 0;
     }
-
-/*    case TYPE_RA_MSG1:
-        wrote = boost::asio::write(s,
-                boost::asio::buffer(p_req
-            + sizeof(ra_samp_request_header_t)),
-            p_req->size));
-        ret = sp_ra_proc_msg1_req((const sample_ra_msg1_t*)((uint8_t*)p_req
-            + sizeof(ra_samp_request_header_t)),
-            p_req->size,
-            &p_resp_msg);
-        if((wrote != p_req->size) || (read != 1))
-        {
-            fprintf(stderr, "\nError, call sp_ra_proc_msg1_req fail [%s].",
-                __FUNCTION__);
-            ret = -1;
-        }
-        else
-        {
-            *p_resp = (ra_samp_response_header_t*) reply;
-        }
-        break;
-
-    case TYPE_RA_MSG3:
-
-        wrote = boost::asio::write(s, boost::asio::buffer(((uint8_t*)p_req +
-            sizeof(ra_samp_request_header_t)),
-            p_req->size));
-
-        ret =sp_ra_proc_msg3_req((const sample_ra_msg3_t*)((uint8_t*)p_req +
-            sizeof(ra_samp_request_header_t)),
-            p_req->size,
-            &p_resp_msg);
-        read = boost::asio::read(s,
-        //TODO Get the actual size
-            boost::asio::buffer(reply, 1)); 
-
-        if((wrote != p_req->size) || (read != 1))
-        {
-            fprintf(stderr, "\nError, call sp_ra_proc_msg3_req fail [%s].",
-                __FUNCTION__);
-            ret = -1;
-        }
-        else
-        {
-            *p_resp = (ra_samp_response_header_t*) reply;
-        }
-        break;
-    
-    case TYPE_RA_OUTPUT:
-        wrote = boost::asio::write(s, boost::asio::buffer(((uint8_t*)p_req + 
-            sizeof(ra_samp_request_header_t)),
-            p_req->size));
-
-        ret = sp_ra_proc_msg_output_req((const life_input_t*) ((uint8_t*)p_req + 
-                                sizeof(ra_samp_request_header_t)),
-                                p_req->size);
-        break;
-
-    default:
-        ret = -1;
-        fprintf(stderr, "\nError, unknown ra message type. Type = %d [%s].",
-            p_req->type, __FUNCTION__);
-        break;
-    }
-*/
-    return ret;
+    return 0;
 }
 
 // Used to free the response messages.  In the sample code, the
