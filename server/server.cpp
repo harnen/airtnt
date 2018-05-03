@@ -77,13 +77,22 @@ void session(tcp::socket sock)
       printf("[header] received type: %d\n", header->type);
       //#endif
         
+      int sum=0;
+      while(sum < header->size) {
 
-      int read_bytes = sock.read_some(boost::asio::buffer(data+sizeof(ra_samp_request_header_t), header->size), error);
-      if (error == boost::asio::error::eof){
-        break; // Connection closed cleanly by peer.
-      }else if (error){
-        throw boost::system::system_error(error); // Some other error.
+        int read_bytes = sock.read_some(boost::asio::buffer(
+          data+sizeof(ra_samp_request_header_t)+sum, header->size - sum), error
+        );
+        sum += read_bytes;
+
+        if (error == boost::asio::error::eof){
+          break; // Connection closed cleanly by peer.
+        }else if (error){
+          throw boost::system::system_error(error); // Some other error.
+        }
       }
+      
+      
 
 
 
