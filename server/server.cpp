@@ -115,12 +115,15 @@ void session(tcp::socket sock)
       printf("Response type: %d\n", p_msg0_resp_full->type);
       #endif 
 
-
+      int wrote = 0;
       // wirte to dump to socket
-      boost::asio::write(sock, boost::asio::buffer(
+      wrote = boost::asio::write(sock, boost::asio::buffer(
         p_msg0_resp_full, 
         sizeof(ra_samp_response_header_t) + p_msg0_resp_full->size)
       );
+      printf("Actual write: %d\n", wrote);
+      printf("Hoped write: %d\n", sizeof(ra_samp_response_header_t) + p_msg0_resp_full->size);
+
 
       if((!p_msg0_resp_full->size) && (p_msg0_resp_full->type == 6)){
         gettimeofday(&t_finished,NULL);
