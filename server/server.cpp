@@ -69,10 +69,12 @@ void session(tcp::socket sock)
       */
       ra_samp_request_header_t *header = (ra_samp_request_header_t*) data;
 
-      #ifdef MYDEBUG 
-      printf("Received size: %d\n", header->size);
-      printf("Received type: %d\n", header->type);
-      #endif
+      printf("[header] length: %d\n", length);
+
+      //#ifdef MYDEBUG 
+      printf("[header] Received size: %d\n", header->size);
+      printf("[header] Received type: %d\n", header->type);
+      //#endif
         
 
       int read_bytes = sock.read_some(boost::asio::buffer(data+sizeof(*header), header->size), error);
