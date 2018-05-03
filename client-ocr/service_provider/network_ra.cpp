@@ -91,8 +91,8 @@ int ra_network_send_receive(const char *server_url,
     }
 
     if(!connected){
-        int result = connect("ec2-18-130-51-114.eu-west-2.compute.amazonaws.com", "8000");
-//        int result = connect("localhost", "8000");
+//        int result = connect("ec2-18-130-51-114.eu-west-2.compute.amazonaws.com", "8000");
+        int result = connect("localhost", "8000");
 //        int result = connect("52.56.161.35", "8000");
         if(result) return -1;
     }

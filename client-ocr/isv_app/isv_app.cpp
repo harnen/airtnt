@@ -72,6 +72,13 @@
 #include "sgx_tcrypto.h"
 #include "sample_libcrypto.h" 
 #include "crypto.h"
+
+//Includes for OCR
+#include <vector>
+#include "Letter.h"
+#include "image_util.h"
+#include "processing.h"
+
 #define ENCLAVE_PATH "isv_enclave.signed.so"
 
 uint8_t* msg1_samples[] = { msg1_sample1, msg1_sample2 };
@@ -82,6 +89,10 @@ uint8_t* attestation_msg_samples[] =
 
 // Some utility functions to output some of the data structures passed between
 // the ISV app and the remote attestation service provider.
+
+using namespace std;
+
+
 void PRINT_BYTE_ARRAY(
     FILE *file, void *mem, uint32_t len)
 {
@@ -677,6 +688,56 @@ int main(int argc, char* argv[])
         memcpy(payload_tag, p_att_result_msg_body->secret.payload_tag, sizeof(sgx_aes_gcm_128bit_tag_t));
         struct timeval t_started, t_stopped;
         unsigned long m_sum = 0;
+
+        /*****************************
+         * OCR
+         ****************************/
+        char const *image_alphabet = "./data/image_alphabet.png";
+        char const *text_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        int const alphabet_length = 26;
+        
+        vector<Letter> letters;
+        load_template(&letters, alphabet_length);
+
+        // convert alphabet letters to C type for ECALL
+        vector< vector<int> > letters_vec;
+        for(int i=0; i<letters.size(); i++) {
+            // export letter i
+            vector< vector<int> > matrix = letters[i].getMatrix();
+            int data_length = matrix.size() * matrix[0].size() + 3;
+            int data[data_length];
+            letters[i].exportLetter(data);
+
+            // save letter
+            int data_size = sizeof(data) / sizeof(data[0]);
+            vector<int> tmp_vec;
+            copy(&data[0], &data[data_size], back_inserter(tmp_vec));
+            //vector<int> tmp_vec (data,  data + sizeof(data) / sizeof(data[0]));
+            letters_vec.push_back(tmp_vec);
+        }
+        vector<int*> letters_ptrs;
+        transform(begin(letters_vec), end(letters_vec), back_inserter(letters_ptrs), [](vector<int> &inner_vec) {
+            return inner_vec.data();
+        });
+        int **letters_c =  letters_ptrs.data();
+        int letters_rows = letters_vec.size();
+
+
+
+        // perform OCR on input
+        char recognised_letters[100]; // make array big enough
+        int length;
+
+        /****************************
+         * END OF OCR
+         ***************************/
+
+
+
+
+
+
+
  
         int counter = 0;       
         if(attestation_passed)
@@ -704,10 +765,12 @@ int main(int argc, char* argv[])
                                   buffer, //p_att_result_msg_body->secret.payload,
                                   payload_size,
                                   payload_tag,//p_att_result_msg_body->secret.payload_tag,
-                                  result,
-                                  &result_size,
                                   &result_key,
-                                  &out_mac);
+                                  &out_mac,
+                                  letters_c, 
+                                  letters_rows, 
+                                  recognised_letters, 
+                                  &length);
                 
                 gettimeofday(&t_stopped,NULL);
                 unsigned long m_stopped = 1000000 * t_stopped.tv_sec + t_stopped.tv_usec;

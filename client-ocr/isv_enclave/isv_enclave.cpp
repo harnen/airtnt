@@ -362,10 +362,12 @@ sgx_status_t put_secret_data(
     uint8_t *p_secret,
     uint32_t secret_size,
     uint8_t *p_gcm_mac,
-    uint8_t* result,
-    int* result_size,
     sgx_aes_gcm_128bit_key_t* result_key,
-    sgx_aes_gcm_128bit_tag_t* out_mac)
+    sgx_aes_gcm_128bit_tag_t* out_mac,
+    int** letters_c, 
+    int letters_rows,
+    char *output_letters, 
+    int *length)
 {
     sgx_status_t ret = SGX_SUCCESS;
     sgx_ec_key_128bit_t sk_key;
@@ -408,7 +410,7 @@ sgx_status_t put_secret_data(
         /*
          * Encrypt the computed results
          */
-        *result_size = sizeof(sgx_aes_gcm_128bit_key_t);
+        /**result_size = sizeof(sgx_aes_gcm_128bit_key_t);
        
         //generate a random encryption key
         sgx_read_rand((unsigned char*) result_key, sizeof(*result_key)); 
@@ -448,7 +450,7 @@ sgx_status_t put_secret_data(
                                     0,
                                     out_mac);
 
-        free(g_secret);
+        free(g_secret);*/
 
     } while(0);
     return ret;
