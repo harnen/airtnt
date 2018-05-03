@@ -75,7 +75,7 @@ void session(tcp::socket sock)
       #endif
         
 
-      sock.read_some(boost::asio::buffer(data+sizeof(*header), header->size), error);
+      int read_bytes = sock.read_some(boost::asio::buffer(data+sizeof(*header), header->size), error);
       if (error == boost::asio::error::eof){
         break; // Connection closed cleanly by peer.
       }else if (error){
@@ -103,6 +103,7 @@ void session(tcp::socket sock)
 
       ra_samp_response_header_t *p_msg0_resp_full = NULL;
 
+      printf("Read bytes: %d\n", read_bytes);
 
       ra_samp_request_header_t* tmp = (ra_samp_request_header_t*) data;
       printf("Received type: %d\n", tmp->type);
