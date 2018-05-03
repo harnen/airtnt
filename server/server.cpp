@@ -69,15 +69,16 @@ void session(tcp::socket sock)
       */
       ra_samp_request_header_t *header = (ra_samp_request_header_t*) data;
 
-      printf("[header] length: %d\n", length);
+      
 
       //#ifdef MYDEBUG 
-      printf("[header] Received size: %d\n", header->size);
-      printf("[header] Received type: %d\n", header->type);
+      printf("[header] length: %d\n", length);
+      printf("[header] received size: %d\n", header->size);
+      printf("[header] received type: %d\n", header->type);
       //#endif
         
 
-      int read_bytes = sock.read_some(boost::asio::buffer(data+sizeof(*header), header->size), error);
+      int read_bytes = sock.read_some(boost::asio::buffer(data+sizeof(ra_samp_request_header_t), header->size), error);
       if (error == boost::asio::error::eof){
         break; // Connection closed cleanly by peer.
       }else if (error){
@@ -103,15 +104,21 @@ void session(tcp::socket sock)
       ra_samp_response_header_t *p_msg0_resp_full = NULL;
       */
 
-      ra_samp_response_header_t *p_msg0_resp_full = NULL;
+      
 
-      printf("Read bytes: %d\n", read_bytes);
-
+      
+      
+      //#ifdef MYDEBUG 
       ra_samp_request_header_t* tmp = (ra_samp_request_header_t*) data;
-      printf("Received type: %d\n", tmp->type);
-      printf("Received size: %d\n", tmp->size);
+      printf("[body] length: %d\n", read_bytes);
+      printf("[body] received type: %d\n", tmp->type);
+      printf("[body] received size: %d\n", tmp->size);
+      printf("\n");
+      //#endif
 
       // receive message
+      ra_samp_response_header_t *p_msg0_resp_full = NULL;
+
       ra_network_send_receive(
         "http://example.com",
         (ra_samp_request_header_t*) data,
