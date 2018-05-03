@@ -71,11 +71,11 @@ void session(tcp::socket sock)
 
       
 
-      //#ifdef MYDEBUG 
+      #ifdef MYDEBUG 
       printf("[header] length: %d\n", length);
       printf("[header] received size: %d\n", header->size);
       printf("[header] received type: %d\n", header->type);
-      //#endif
+      #endif
         
       int sum=0;
       int read_bytes=0;
@@ -118,13 +118,13 @@ void session(tcp::socket sock)
 
       
       
-      //#ifdef MYDEBUG 
+      #ifdef MYDEBUG 
       ra_samp_request_header_t* tmp = (ra_samp_request_header_t*) data;
       printf("[body] length: %d\n", read_bytes);
       printf("[body] received type: %d\n", tmp->type);
       printf("[body] received size: %d\n", tmp->size);
       printf("\n");
-      //#endif
+      #endif
 
       // receive message
       ra_samp_response_header_t *p_msg0_resp_full = NULL;
