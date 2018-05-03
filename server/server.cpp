@@ -103,6 +103,11 @@ void session(tcp::socket sock)
 
       ra_samp_response_header_t *p_msg0_resp_full = NULL;
 
+
+      ra_samp_request_header_t* tmp = (ra_samp_request_header_t*) data;
+      printf("Received type: %d\n", tmp->type);
+      printf("Received size: %d\n", tmp->size);
+
       // receive message
       ra_network_send_receive(
         "http://example.com",
