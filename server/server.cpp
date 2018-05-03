@@ -74,6 +74,7 @@ void session(tcp::socket sock)
         
       int sum=0;
       int read_bytes=0;
+      
       while(sum < header->size) {
 
         read_bytes += sock.read_some(boost::asio::buffer(
@@ -121,9 +122,10 @@ void session(tcp::socket sock)
         p_msg0_resp_full, 
         sizeof(ra_samp_response_header_t) + p_msg0_resp_full->size)
       );
+      #ifdef MYDEBUG 
       printf("Actual write: %d\n", wrote);
       printf("Hoped write: %d\n", sizeof(ra_samp_response_header_t) + p_msg0_resp_full->size);
-
+      #endif 
 
       if((!p_msg0_resp_full->size) && (p_msg0_resp_full->type == 6)){
         gettimeofday(&t_finished,NULL);
