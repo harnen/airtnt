@@ -870,6 +870,9 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
         // copy result to server
         *pp_att_result_msg = (ra_samp_response_header_t*) rep_buffer;
 
+        // reset counter
+        counter = 0;
+
         return 0;
     }
 
