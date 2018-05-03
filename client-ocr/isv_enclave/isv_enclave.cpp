@@ -37,6 +37,9 @@
 #include "string.h"
 
 #include "life.h"
+#include "ocr.h"
+#include "ocr_type.h"
+
 
 // This is the public EC key of the SP. The corresponding private EC key is
 // used by the SP to sign data used in the remote attestation SIGMA protocol
