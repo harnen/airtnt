@@ -78,9 +78,10 @@ void session(tcp::socket sock)
       //#endif
         
       int sum=0;
+      int read_bytes=0;
       while(sum < header->size) {
 
-        int read_bytes = sock.read_some(boost::asio::buffer(
+        read_bytes += sock.read_some(boost::asio::buffer(
           data+sizeof(ra_samp_request_header_t)+sum, header->size - sum), error
         );
         sum += read_bytes;
