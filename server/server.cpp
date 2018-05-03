@@ -167,7 +167,7 @@ void session(tcp::socket sock)
 
         ra_free_network_response_buffer(p_msg0_resp_full);
 
-        return;
+        exit(0);
       }
 
       ra_free_network_response_buffer(p_msg0_resp_full);
