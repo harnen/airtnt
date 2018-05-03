@@ -76,8 +76,9 @@ ifneq ($(SGX_MODE), HW)
 else
 	Urts_Library_Name := sgx_urts
 endif
+SFML = -lsfml-graphics -lsfml-window -lsfml-system
 
-App_Cpp_Files := isv_app/isv_app.cpp isv_app/crypto.cpp
+App_Cpp_Files := isv_app/isv_app.cpp isv_app/crypto.cpp isv_app/Letter.cpp isv_app/image_util.cpp isv_app/processing.cpp
 App_Include_Paths := -Iservice_provider -I$(SGX_SDK)/include
 
 App_C_Flags := $(SGX_COMMON_CFLAGS) -fPIC -Wno-attributes $(App_Include_Paths)
@@ -95,7 +96,7 @@ else
 endif
 
 App_Cpp_Flags := $(App_C_Flags) -std=c++11 -Isample_libcrypto
-App_Link_Flags := $(SGX_COMMON_CFLAGS) -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -L. -lsgx_ukey_exchange -lpthread -lsample_libcrypto -Lsample_libcrypto -lcrypto -lservice_provider -lboost_system -Wl,-rpath=$(CURDIR)/sample_libcrypto -Wl,-rpath=$(CURDIR)
+App_Link_Flags := $(SGX_COMMON_CFLAGS) -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -L. -lsgx_ukey_exchange -lpthread -lsample_libcrypto -Lsample_libcrypto -lcrypto -lservice_provider $(SFML) -lboost_system -Wl,-rpath=$(CURDIR)/sample_libcrypto -Wl,-rpath=$(CURDIR) 
 
 ifneq ($(SGX_MODE), HW)
 	App_Link_Flags += -lsgx_uae_service_sim
