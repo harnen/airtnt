@@ -20,7 +20,7 @@ cd
 
 # install airtnt
 git clone https://github.com/harnen/airtnt.git
-cd airtnt/server
+cd ~/airtnt/server
 make
 
 # run server with steps=100, max_iterations=1000
