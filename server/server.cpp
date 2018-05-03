@@ -161,13 +161,22 @@ void session(tcp::socket sock)
         gettimeofday(&t_finished,NULL);
         unsigned long m_finished = 1000000 * t_finished.tv_sec + t_finished.tv_usec;
         printf("Time connected [us] %lu, time finished [us] %lu, time diff [us] %lu, iterations %d\n", m_connected, m_finished, m_finished - m_connected, iter_counter);
+        
+        iter_counter = 0;
+
+
+        ra_free_network_response_buffer(p_msg0_resp_full);
+
         return;
       }
+
+      ra_free_network_response_buffer(p_msg0_resp_full);
+
       ////////////////////////////////
       // EDIT
       ////////////////////////////////
       // free mem
-      ra_free_network_response_buffer(p_msg0_resp_full);
+      
       ////////////////////////////////
       // END EDIT
       ////////////////////////////////
