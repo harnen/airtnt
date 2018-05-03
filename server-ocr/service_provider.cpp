@@ -46,6 +46,9 @@
 
 #include "misc.h"
 
+#include <vector>
+using namespace std;
+
 
 #ifndef SAFE_FREE
 #define SAFE_FREE(ptr) {if (NULL != (ptr)) {free(ptr); (ptr) = NULL;}}
@@ -449,7 +452,10 @@ int sp_ra_proc_msg1_req(const sample_ra_msg1_t *p_msg1,
 // Process remote attestation message 3
 int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
                         uint32_t msg3_size,
-                        ra_samp_response_header_t **pp_att_result_msg, int steps)
+                        ra_samp_response_header_t **pp_att_result_msg, 
+                        int steps, 
+                        ocr_input_t* ocr_input
+)
 {
 
     int ret = 0;
@@ -748,7 +754,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
            (isv_policy_passed == true))
         {
             ret = sample_rijndael128GCM_encrypt(&g_sp_db.sk_key,
-                        (uint8_t*) input,
+                        (uint8_t*) ocr_input,
                         msg_size,
                         p_att_result_msg->secret.payload,
                         &aes_gcm_iv[0],
@@ -798,7 +804,8 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
 
 int sp_ra_proc_msg_output_req(const life_input_t *p_output,
                                 uint32_t output_size, ra_samp_response_header_t **pp_att_result_msg, 
-                                int steps, int max_iterations)
+                                int steps, int max_iterations, ocr_input_t* ocr_input
+)
 {
 
     uint8_t iv[12] = {0};
@@ -885,6 +892,9 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
     input->array[5] = '1';
 
 
+
+
+
     // pointers
     ra_samp_response_header_t* rep_header = NULL;
     
@@ -908,7 +918,7 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
 
 
 
-    uint8_t* tmp = (uint8_t*) input;
+    uint8_t* tmp = (uint8_t*) ocr_input;
     // printing input
     #ifdef MYDEBUG 
     printf("Created an input message. Size: %lu\n", msg_size);

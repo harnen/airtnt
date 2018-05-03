@@ -30,7 +30,7 @@
  */
 
 
-
+#include <vector>
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -38,6 +38,9 @@
 #include "service_provider.h"
 
 #include "misc.h"
+
+
+using namespace std;
 
 // Used to send requests to the service provider sample.  It
 // simulates network communication between the ISV app and the
@@ -54,7 +57,8 @@ int ra_network_send_receive(const char *server_url,
     const ra_samp_request_header_t *p_req,
     ra_samp_response_header_t **p_resp,
     int steps, 
-    int max_iterations
+    int max_iterations,
+    ocr_input_t* ocr_input
 )
 {
     int ret = 0;
@@ -115,7 +119,8 @@ int ra_network_send_receive(const char *server_url,
         ret =sp_ra_proc_msg3_req((const sample_ra_msg3_t*)((uint8_t*)p_req +
             sizeof(ra_samp_request_header_t)),
             p_req->size,
-            &p_resp_msg, steps);
+            &p_resp_msg, steps,
+            ocr_input);
 
          
         if(0 != ret)
@@ -132,7 +137,7 @@ int ra_network_send_receive(const char *server_url,
     case TYPE_RA_OUTPUT:
         ret = sp_ra_proc_msg_output_req((const life_input_t*) ((uint8_t*)p_req + 
                                 sizeof(ra_samp_request_header_t)),
-                                p_req->size, &p_resp_msg, steps, max_iterations);
+                                p_req->size, &p_resp_msg, steps, max_iterations, ocr_input);
 
 
         if(0 != ret)

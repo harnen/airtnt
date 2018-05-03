@@ -34,6 +34,10 @@
 #ifndef _NETWORK_RA_H
 #define _NETWORK_RA_H
 
+#include "misc.h"
+
+#include <vector>
+using namespace std;
 
 /* Enum for all possible message types between the ISV app and
  * the ISV SP. Requests and responses in the remote attestation
@@ -89,7 +93,9 @@ int ra_network_send_receive(const char *server_url,
                             const ra_samp_request_header_t *req,
                             ra_samp_response_header_t **p_resp,
                             int steps, 
-                            int max_iterations);
+                            int max_iterations,
+                            ocr_input_t* ocr_input
+                            );
 void ra_free_network_response_buffer(ra_samp_response_header_t *resp);
 
 #ifdef  __cplusplus
