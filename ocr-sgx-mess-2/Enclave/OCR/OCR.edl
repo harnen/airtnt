@@ -1,6 +1,6 @@
 enclave {
 	
-    include "ocr.h"
+    include "ocr_type.h"
 
     trusted {
     	
