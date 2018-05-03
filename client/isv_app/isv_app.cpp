@@ -327,7 +327,7 @@ int main(int argc, char* argv[])
             ret = sgx_ra_get_msg1(context, enclave_id, sgx_ra_get_ga,
                                   (sgx_ra_msg1_t*)((uint8_t*)p_msg1_full
                                   + sizeof(ra_samp_request_header_t)));
-            //sleep(3); // Wait 3s between retries
+            sleep(3); // Wait 3s between retries
         } while (SGX_ERROR_BUSY == ret && busy_retry_time--);
         if(SGX_SUCCESS != ret)
         {
