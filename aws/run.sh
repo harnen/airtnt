@@ -7,4 +7,4 @@ git pull
 cd ~/airtnt/server
 make
 echo "Server running..."
-LD_LIBRARY_PATH=./sample_libcrypto ./server 8000 10 10000
+LD_LIBRARY_PATH=./sample_libcrypto ./server 8000 10 100000
