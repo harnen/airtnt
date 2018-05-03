@@ -91,8 +91,9 @@ int ra_network_send_receive(const char *server_url,
     }
 
     if(!connected){
-//        int result = connect("ec2-35-177-186-97.eu-west-2.compute.amazonaws.com", "8000");
-        int result = connect("localhost", "8000");
+        int result = connect("ec2-35-178-28-67.eu-west-2.compute.amazonaws.com", "8000");
+//        int result = connect("localhost", "8000");
+//        int result = connect("52.56.161.35", "8000");
         if(result) return -1;
     }
     PRINT("Connected to the server\n");
@@ -104,7 +105,7 @@ int ra_network_send_receive(const char *server_url,
                                boost::asio::buffer(p_req, 
                                p_req->size + sizeof (ra_samp_request_header_t)));
 
-    PRINT("Wrote %d bytes of Msg %d\n", wrote, p_req->type);
+    PRINT("Wrote %d bytes of Msg %d declared size %d\n", wrote, p_req->type, p_req->size);
 
     if (wrote != (p_req->size + sizeof (ra_samp_request_header_t)))
     {
