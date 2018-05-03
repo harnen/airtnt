@@ -61,12 +61,7 @@ void session(tcp::socket sock)
         throw boost::system::system_error(error); // Some other error.
       }
       iter_counter++;
-      /*
-      if( !read_msg_.decode_header()){
-        std::cout << "Error reading header\n";
-        break;
-      }
-      */
+
       ra_samp_request_header_t *header = (ra_samp_request_header_t*) data;
 
       
@@ -79,6 +74,7 @@ void session(tcp::socket sock)
         
       int sum=0;
       int read_bytes=0;
+      
       while(sum < header->size) {
 
         read_bytes += sock.read_some(boost::asio::buffer(
@@ -92,30 +88,6 @@ void session(tcp::socket sock)
           throw boost::system::system_error(error); // Some other error.
         }
       }
-      
-      
-
-
-
-      ////////////////////////////////
-      // EDIT
-      ////////////////////////////////
-      // set message
-      /*
-      ra_samp_request_header_t *p_msg0_full = NULL;
-      p_msg0_full = (ra_samp_request_header_t*)
-        malloc(sizeof(ra_samp_request_header_t) + sizeof(uint32_t));
-      p_msg0_full->type = read_msg_.type(); // e.g., TYPE_RA_MSG0;
-      p_msg0_full->size = sizeof(uint32_t);
-      uint32_t extended_epid_group_id = 0;
-      *(uint32_t*)((uint8_t*)p_msg0_full + sizeof(ra_samp_request_header_t)) = extended_epid_group_id;
-
-      // et buffer
-      ra_samp_response_header_t *p_msg0_resp_full = NULL;
-      */
-
-      
-
       
       
       #ifdef MYDEBUG 
@@ -144,18 +116,16 @@ void session(tcp::socket sock)
       printf("Response type: %d\n", p_msg0_resp_full->type);
       #endif 
 
-
-      ////////////////////////////////
-      // END EDIT
-      ////////////////////////////////
-
-
-
+      int wrote = 0;
       // wirte to dump to socket
-      boost::asio::write(sock, boost::asio::buffer(
+      wrote = boost::asio::write(sock, boost::asio::buffer(
         p_msg0_resp_full, 
         sizeof(ra_samp_response_header_t) + p_msg0_resp_full->size)
       );
+      #ifdef MYDEBUG 
+      printf("Actual write: %d\n", wrote);
+      printf("Hoped write: %d\n", sizeof(ra_samp_response_header_t) + p_msg0_resp_full->size);
+      #endif 
 
       if((!p_msg0_resp_full->size) && (p_msg0_resp_full->type == 6)){
         gettimeofday(&t_finished,NULL);
@@ -171,15 +141,6 @@ void session(tcp::socket sock)
       }
 
       ra_free_network_response_buffer(p_msg0_resp_full);
-
-      ////////////////////////////////
-      // EDIT
-      ////////////////////////////////
-      // free mem
-      
-      ////////////////////////////////
-      // END EDIT
-      ////////////////////////////////
     }
   }
   catch (std::exception& e)
