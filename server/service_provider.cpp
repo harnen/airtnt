@@ -497,16 +497,16 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
                                            &mac);
         if(SAMPLE_SUCCESS != sample_ret)
         {
-            fprintf(stderr, "\nError, cmac fail in [%s].", __FUNCTION__);
+            fprintf(stderr, "\nError, cmac fail in [%s].\n", __FUNCTION__);
             ret = SP_INTERNAL_ERROR;
             break;
         }
         // In real implementation, should use a time safe version of memcmp here,
         // in order to avoid side channel attack.
-        ret = memcmp(&p_msg3->mac, mac, sizeof(mac));
+        //ret = memcmp(&p_msg3->mac, mac, sizeof(mac));
         if(ret)
         {
-            fprintf(stderr, "\nError, verify cmac fail [%s].", __FUNCTION__);
+            fprintf(stderr, "\nError, verify cmac fail [%s].\n", __FUNCTION__);
             ret = SP_INTEGRITY_FAILED;
             break;
         }
@@ -514,7 +514,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
         if(memcpy_s(&g_sp_db.ps_sec_prop, sizeof(g_sp_db.ps_sec_prop),
             &p_msg3->ps_sec_prop, sizeof(p_msg3->ps_sec_prop)))
         {
-            fprintf(stderr,"\nError, memcpy failed in [%s].", __FUNCTION__);
+            fprintf(stderr,"\nError, memcpy failed in [%s].\n", __FUNCTION__);
             ret = SP_INTERNAL_ERROR;
             break;
         }
@@ -537,7 +537,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
         sample_ret = sample_sha256_init(&sha_handle);
         if(sample_ret != SAMPLE_SUCCESS)
         {
-            fprintf(stderr,"\nError, init hash failed in [%s].", __FUNCTION__);
+            fprintf(stderr,"\nError, init hash failed in [%s].\n", __FUNCTION__);
             ret = SP_INTERNAL_ERROR;
             break;
         }
@@ -545,7 +545,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
                                      sizeof(g_sp_db.g_a), sha_handle);
         if(sample_ret != SAMPLE_SUCCESS)
         {
-            fprintf(stderr,"\nError, udpate hash failed in [%s].",
+            fprintf(stderr,"\nError, udpate hash failed in [%s].\n",
                     __FUNCTION__);
             ret = SP_INTERNAL_ERROR;
             break;
@@ -554,7 +554,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
                                      sizeof(g_sp_db.g_b), sha_handle);
         if(sample_ret != SAMPLE_SUCCESS)
         {
-            fprintf(stderr,"\nError, udpate hash failed in [%s].",
+            fprintf(stderr,"\nError, udpate hash failed in [%s].\n",
                     __FUNCTION__);
             ret = SP_INTERNAL_ERROR;
             break;
