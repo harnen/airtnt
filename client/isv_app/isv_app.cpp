@@ -670,9 +670,7 @@ int main(int argc, char* argv[])
 
         uint8_t* p_msg_reply;
         int payload_size = p_att_result_msg_body->secret.payload_size;
-        uint8_t* buffer = (uint8_t*)  malloc(payload_size);
-        PRINT("Allocating buffer of size %d\n", payload_size);
-        memcpy(buffer, p_att_result_msg_body->secret.payload, payload_size);
+        uint8_t* buffer = (uint8_t*) p_att_result_msg_body->secret.payload;
         uint8_t* result = (uint8_t*) malloc(payload_size);
 
         sgx_aes_gcm_128bit_tag_t payload_tag;
@@ -738,14 +736,15 @@ int main(int argc, char* argv[])
                 int rett = ra_network_send_receive("http://SampleServiceProvider.intel.com/",
                                         p_msg_result,
                                         (ra_samp_response_header_t**) &p_msg_reply); //TODO: Change it - for now, we don't assume any response
-                //free(p_msg_result);
+                free(p_msg_result);
 
                 if(rett){PRINT("Finishing the loop"); ret = 0;  break;}
                 PRINT("Received network buffer (%d): ", payload_size);
                 for(int i = 0; i < sizeof(ra_samp_response_header_t) + payload_size; i++){
                     PRINT("%d,", p_msg_reply[i]);
                 }
-                memcpy(buffer, (uint8_t*) p_msg_reply + sizeof(ra_samp_response_header_t), payload_size); 
+//                memcpy(buffer, (uint8_t*) p_msg_reply + sizeof(ra_samp_response_header_t), payload_size); 
+                buffer = p_msg_reply+sizeof(ra_samp_response_header_t);
 //                getchar();
                 PRINT("Counter %d\n", counter++);
             }while(1);
@@ -753,7 +752,6 @@ int main(int argc, char* argv[])
             printf("Time spent in the enclave %lu [us]\n", m_sum);
             free(result);
             free (p_msg_reply);
-            free(buffer);
 
  
             if((SGX_SUCCESS != ret)  || (SGX_SUCCESS != status))

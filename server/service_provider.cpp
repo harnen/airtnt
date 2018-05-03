@@ -110,7 +110,7 @@ static int g_sp_credentials = 0;
 static int g_authentication_token = 0;
 
 //uint8_t g_secret[8] = {0,1,2,3,4,5,6,7};
-unsigned int size = 20;
+unsigned int size = 100;
 unsigned long msg_size = sizeof(life_input_t) + (size * size * sizeof(char));
 
 sample_spid_t g_spid;
