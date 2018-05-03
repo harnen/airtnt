@@ -1,0 +1,31 @@
+enclave {
+	
+    include "ocr.h"
+
+    trusted {
+    	
+        public void test_function([in] int* a, [in] int* b, [out] int* c);
+        public void test_function_2([in, count=len] const char **arr, size_t len);
+        public void test_function_3([in, count=rows] const int **arr, size_t rows, size_t cols);
+
+        /*
+        public void character_recognition_wrap([in, count=rows] int** input, int rows, int cols, [in, count=letters_rows] int** letters_c, int letters_rows, [out, count=100] char *output_letters, [out] int *length);
+        */
+
+        public void character_recognition_wrap(
+            [in, size=ocr_input_size] ocr_input_t* ocr_input, 
+            size_t ocr_input_size,
+            [in, count=letters_rows] int** letters_c, int letters_rows, 
+            [out, count=100] char *output_letters, 
+            [out] int *length
+        );
+
+    };
+
+    untrusted {
+        /* define OCALLs here. */
+        void ocall_print([in, string]const char* str);
+        void ocall_print_int(int data);
+        void ocall_print_char(int data);
+    };
+};

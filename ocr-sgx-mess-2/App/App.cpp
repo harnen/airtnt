@@ -13,6 +13,8 @@
 
 #include <string>
 
+#include "ocr.h"
+
 //using namespace std;
 
 
@@ -32,6 +34,8 @@ void ocall_print_int(int data) {
 void ocall_print_char(int data) {
     printf("%c\n", data);
 }
+
+
 
 
 /* 
@@ -159,6 +163,18 @@ int main(int argc, char const *argv[]) {
     int cols = pixels[0].size();
 
 
+    // convert to 1d array
+    unsigned long ocr_input_size = sizeof(ocr_input_t) + (rows * cols * sizeof(int));
+    ocr_input_t* ocr_input = (ocr_input_t*)malloc(ocr_input_size);
+    ocr_input->rows = rows;
+    ocr_input->cols = cols;
+    for (int i=0; i < rows; ++i) {
+        for (int j=0; j < cols; ++j) {
+            ocr_input->payload[i*rows+j] = input[i][j];
+        }
+    }
+
+
     //for (int i = 0; i < rows; i++) {printf("%d\n", input[i][0]);}
 
 
@@ -192,7 +208,8 @@ int main(int argc, char const *argv[]) {
     // perform OCR on input
     char recognised_letters[100]; // make array big enough
     int length;
-    character_recognition_wrap(global_eid, input, rows, cols, letters_c, letters_rows, recognised_letters, &length);
+    //character_recognition_wrap(global_eid, input, rows, cols, letters_c, letters_rows, recognised_letters, &length);
+    character_recognition_wrap(global_eid, ocr_input, ocr_input_size, letters_c, letters_rows, recognised_letters, &length);
 
     /*********************** END ECALL ***********************/
 

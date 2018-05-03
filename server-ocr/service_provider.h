@@ -47,8 +47,16 @@ typedef struct life_input
 {
     uint8_t size;
     uint8_t steps;
-    char array[]; 
+    int array[]; 
 } life_input_t;
+
+
+typedef struct ocr_input
+{
+    uint8_t rows;
+    uint8_t cols;
+    char payload[]; 
+} ocr_input_t;
 
 
 typedef enum {

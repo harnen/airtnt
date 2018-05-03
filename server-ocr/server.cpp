@@ -172,14 +172,6 @@ void session(tcp::socket sock)
 
       ra_free_network_response_buffer(p_msg0_resp_full);
 
-      ////////////////////////////////
-      // EDIT
-      ////////////////////////////////
-      // free mem
-      
-      ////////////////////////////////
-      // END EDIT
-      ////////////////////////////////
     }
   }
   catch (std::exception& e)
