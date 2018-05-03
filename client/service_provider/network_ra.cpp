@@ -52,7 +52,7 @@
 
 // @return int
 
-#define MAX_BUF_SIZE 20000
+#define MAX_BUF_SIZE 40000
 
 using boost::asio::ip::tcp;
 boost::asio::io_context io_context;
@@ -91,8 +91,8 @@ int ra_network_send_receive(const char *server_url,
     }
 
     if(!connected){
-        int result = connect("ec2-35-178-28-67.eu-west-2.compute.amazonaws.com", "8000");
-//        int result = connect("localhost", "8000");
+//        int result = connect("ec2-35-178-28-67.eu-west-2.compute.amazonaws.com", "8000");
+        int result = connect("localhost", "8000");
 //        int result = connect("52.56.161.35", "8000");
         if(result) return -1;
     }
@@ -125,8 +125,12 @@ int ra_network_send_receive(const char *server_url,
 
     if(reply_header->size > 0){
         PRINT("Reading the rest of the message\n");
-        read = boost::asio::read(s,
-                                 boost::asio::buffer(reply + sizeof(ra_samp_response_header_t), reply_header->size)); 
+        read = 0;
+        while(read < reply_header->size){
+            read += boost::asio::read(s,
+                                 boost::asio::buffer(reply + sizeof(ra_samp_response_header_t) + read, 
+                                 reply_header->size - read)); 
+        }
         *p_resp = (ra_samp_response_header_t*) reply;
         PRINT("Setting the response pointer to %d\n", reply);
     }else{

@@ -110,7 +110,7 @@ static int g_sp_credentials = 0;
 static int g_authentication_token = 0;
 
 //uint8_t g_secret[8] = {0,1,2,3,4,5,6,7};
-unsigned int size = 10;
+unsigned int size = 20;
 unsigned long msg_size = sizeof(life_input_t) + (size * size * sizeof(char));
 
 sample_spid_t g_spid;
@@ -844,7 +844,7 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
    
     #ifdef MYDEBUG 
     printf("Decrypted on service provider: ");
-    for(int i = 0; i < 16; i++){
+    for(int i = 0; i < msg_size; i++){
         printf("%d,", decrypted[i]);
     }
     printf("\n");

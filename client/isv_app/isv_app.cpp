@@ -328,6 +328,7 @@ int main(int argc, char* argv[])
                                   (sgx_ra_msg1_t*)((uint8_t*)p_msg1_full
                                   + sizeof(ra_samp_request_header_t)));
             //sleep(3); // Wait 3s between retries
+
         } while (SGX_ERROR_BUSY == ret && busy_retry_time--);
         if(SGX_SUCCESS != ret)
         {
@@ -668,10 +669,14 @@ int main(int argc, char* argv[])
         // passed)
 
         uint8_t* p_msg_reply;
-        uint8_t* buffer = (uint8_t*)  malloc(p_att_result_msg_body->secret.payload_size);
-        memcpy(buffer, p_att_result_msg_body->secret.payload, p_att_result_msg_body->secret.payload_size);
-        uint8_t* result = (uint8_t*) malloc(p_att_result_msg_body->secret.payload_size);
+        int payload_size = p_att_result_msg_body->secret.payload_size;
+        uint8_t* buffer = (uint8_t*)  malloc(payload_size);
+        PRINT("Allocating buffer of size %d\n", payload_size);
+        memcpy(buffer, p_att_result_msg_body->secret.payload, payload_size);
+        uint8_t* result = (uint8_t*) malloc(payload_size);
 
+        sgx_aes_gcm_128bit_tag_t payload_tag;
+        memcpy(payload_tag, p_att_result_msg_body->secret.payload_tag, sizeof(sgx_aes_gcm_128bit_tag_t));
         struct timeval t_started, t_stopped;
         unsigned long m_sum = 0;
  
@@ -679,9 +684,9 @@ int main(int argc, char* argv[])
         if(attestation_passed)
         {
             do{
-                PRINT("Received msg size: %d\n", p_att_result_msg_body->secret.payload_size);
+                PRINT("Received msg size: %d\n", payload_size);
 
-                for(int i = 0; i < p_att_result_msg_body->secret.payload_size; i++){
+                for(int i = 0; i < payload_size; i++){
                     PRINT("%d,", buffer[i]);
                 }            
                 PRINT("\n");
@@ -699,8 +704,8 @@ int main(int argc, char* argv[])
                                   &status,
                                   context,
                                   buffer, //p_att_result_msg_body->secret.payload,
-                                  p_att_result_msg_body->secret.payload_size,
-                                  p_att_result_msg_body->secret.payload_tag,
+                                  payload_size,
+                                  payload_tag,//p_att_result_msg_body->secret.payload_tag,
                                   result,
                                   &result_size,
                                   &result_key,
@@ -710,8 +715,12 @@ int main(int argc, char* argv[])
                 unsigned long m_stopped = 1000000 * t_stopped.tv_sec + t_stopped.tv_usec;
                 m_sum += m_stopped - m_started;
 
+                if(status){
+                    printf("Failed putting input into the enclave - break\n");
+                    break;
+                }
                 //send back the result
-                uint32_t output_size = p_att_result_msg_body->secret.payload_size; //we assume that input is the same as output
+                uint32_t output_size = payload_size; //we assume that input is the same as output
 
                 ra_samp_request_header_t* p_msg_result = (ra_samp_request_header_t*)
                     malloc(sizeof(ra_samp_request_header_t)
@@ -731,12 +740,12 @@ int main(int argc, char* argv[])
                                         (ra_samp_response_header_t**) &p_msg_reply); //TODO: Change it - for now, we don't assume any response
                 //free(p_msg_result);
 
-                if(rett){ret = 0;  break;}
-                PRINT("Received network buffer (%d): ", p_att_result_msg_body->secret.payload_size);
-                for(int i = 0; i < sizeof(ra_samp_response_header_t) + p_att_result_msg_body->secret.payload_size; i++){
+                if(rett){PRINT("Finishing the loop"); ret = 0;  break;}
+                PRINT("Received network buffer (%d): ", payload_size);
+                for(int i = 0; i < sizeof(ra_samp_response_header_t) + payload_size; i++){
                     PRINT("%d,", p_msg_reply[i]);
                 }
-                memcpy(buffer, (uint8_t*) p_msg_reply + sizeof(ra_samp_response_header_t), p_att_result_msg_body->secret.payload_size); 
+                memcpy(buffer, (uint8_t*) p_msg_reply + sizeof(ra_samp_response_header_t), payload_size); 
 //                getchar();
                 PRINT("Counter %d\n", counter++);
             }while(1);
@@ -795,7 +804,7 @@ CLEANUP:
     SAFE_FREE(p_msg1_full);
     SAFE_FREE(p_msg0_full);
     PRINT("\nEnter a character before exit ...\n");
-    getchar();
+//    getchar();
     return ret;
 }
 
