@@ -63,7 +63,8 @@ int main(int argc , char *argv[]) {
     ocr_input->cols = cols;
     for (int i=0; i < rows; ++i) {
         for (int j=0; j < cols; ++j) {
-            ocr_input->payload[i*rows+j] = input[i][j];
+            //ocr_input->payload[i*rows+j] = input[i][j];
+            ocr_input->payload[i][j] = input[i][j];
         }
     }
     //memcpy(ocr_input->payload, input, rows*cols*sizeof(int));
