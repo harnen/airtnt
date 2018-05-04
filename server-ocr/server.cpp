@@ -57,9 +57,9 @@ int main(int argc , char *argv[]) {
     int cols = pixels[0].size();
 
     // convert to 1d array
-    ocr_input->iter = steps;
     unsigned long ocr_input_size = sizeof(ocr_input_t) + (rows * cols * sizeof(int));
     ocr_input_t* ocr_input = (ocr_input_t*)malloc(ocr_input_size);
+    ocr_input->iter = steps;
     ocr_input->rows = rows;
     ocr_input->cols = cols;
     for (int i=0; i < rows; ++i) {
