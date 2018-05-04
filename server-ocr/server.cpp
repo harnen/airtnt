@@ -40,7 +40,7 @@ int main(int argc , char *argv[]) {
     int iter_counter=0;
 
     // load image
-    char const *image_input = "./data/input_4_OK.png";
+    char const *image_input = "./data/input_5_OK.png";
     vector< vector<int> > pixels;
     if (load_image(image_input, &pixels) != 0) {
         PRINT("[server] Could not load input image: %s\n", image_input);
@@ -137,7 +137,11 @@ int main(int argc , char *argv[]) {
         // read body
         read_size = 0;
         while(read_size < header->size) {
-            read_size += recv(client_sock, client_message+sizeof(ra_samp_request_header_t) + read_size, header->size - read_size, 0); 
+            read_size += recv(
+                client_sock, 
+                client_message+sizeof(ra_samp_request_header_t) + read_size, 
+                header->size - read_size, 0
+            ); 
             PRINT("[server] Received body size: %d\n", read_size);
         }
         if (header->size != read_size) {
