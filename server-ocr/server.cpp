@@ -76,7 +76,6 @@ int main(int argc , char *argv[]) {
     PRINT("[server] Socket created\n");
     int option = 1;
     setsockopt(socket_desc, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
-    setsockopt(socket_desc, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
         
     // prepare the sockaddr_in structure
     server.sin_family = AF_INET;
