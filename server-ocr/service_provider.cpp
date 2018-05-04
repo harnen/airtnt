@@ -810,7 +810,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
     return ret;
 }
 
-int sp_ra_proc_msg_output_req(const life_input_t *p_output,
+int sp_ra_proc_msg_output_req(const char *p_output,
                                 uint32_t output_size, ra_samp_response_header_t **pp_att_result_msg, 
                                 int steps, int max_iterations, ocr_input_t* ocr_input
 )
@@ -860,9 +860,10 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
                         NULL);
    
     #ifdef MYDEBUG 
+    printf("Received size: %d", output_size);
     printf("Decrypted on service provider: ");
-    for(int i = 0; i < ocr_input_size; i++){
-        printf("%d,", decrypted[i]);
+    for(int i = 0; i < output_size; i++){
+        printf("%c,", decrypted[i]);
     }
     printf("\n");
     #endif

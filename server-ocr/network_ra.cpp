@@ -135,11 +135,11 @@ int ra_network_send_receive(const char *server_url,
         break;
     
     case TYPE_RA_OUTPUT:
-        ret = sp_ra_proc_msg_output_req((const life_input_t*) ((uint8_t*)p_req + 
+        ret = sp_ra_proc_msg_output_req((const char*) ((uint8_t*)p_req + 
                                 sizeof(ra_samp_request_header_t)),
                                 p_req->size, &p_resp_msg, steps, max_iterations, ocr_input);
 
-
+ 
         if(0 != ret)
         {
             fprintf(stderr, "\nError, call sp_ra_proc_msg3_req fail [%s].",
