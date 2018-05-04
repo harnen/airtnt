@@ -37,10 +37,11 @@
 #include "network_ra.h"
 #include "service_provider.h"
 
-#include <boost/asio.hpp>
 #include <iostream>
 #include "chat_message.hpp"
 #include "../isv_app/misc.h"
+#include <sys/socket.h>    //socket
+#include <arpa/inet.h> //inet_addr
 // Used to send requests to the service provider sample.  It
 // simulates network communication between the ISV app and the
 // ISV service provider.  This would be modified in a real
@@ -54,26 +55,33 @@
 
 #define MAX_BUF_SIZE 40000
 
-using boost::asio::ip::tcp;
-boost::asio::io_context io_context;
-tcp::socket s(io_context);
+int sock;
 bool connected = false;
-
+struct sockaddr_in server;
 uint8_t* reply;
 
 int connect(std::string url, std::string port){
-    try
-    {
-        reply = (uint8_t*) malloc(MAX_BUF_SIZE);
-        tcp::resolver resolver(io_context);
-        boost::asio::connect(s, resolver.resolve(url, port));
-        connected = true;
-        return 0;
-    }catch (std::exception& e){
-        std::cerr << "Exception: " << e.what() << "\n";
-        free(reply);
-        return -1;
+    reply = (uint8_t*) malloc(MAX_BUF_SIZE);
+    
+    sock = socket(AF_INET , SOCK_STREAM , 0);
+    if (sock == -1){
+        printf("Could not create socket");
+        return 1;
     }
+    PRINT("Socket created");
+     
+    server.sin_addr.s_addr = inet_addr("18.130.38.222");
+    server.sin_family = AF_INET;
+    server.sin_port = htons(8000);
+ 
+    //Connect to remote server
+    if (connect(sock , (struct sockaddr *)&server , sizeof(server)) < 0)
+    {
+        perror("connect failed. Error");
+        return 1;
+    }
+    connected = true;
+    return 0;
 }
 
 int ra_network_send_receive(const char *server_url,
@@ -91,8 +99,8 @@ int ra_network_send_receive(const char *server_url,
     }
 
     if(!connected){
-//        int result = connect("ec2-18-130-38-222.eu-west-2.compute.amazonaws.com", "8000");
-        int result = connect("localhost", "8000");
+        int result = connect("ec2-18-130-38-222.eu-west-2.compute.amazonaws.com", "8000");
+//        int result = connect("localhost", "8000");
 //        int result = connect("52.56.161.35", "8000");
         if(result) return -1;
     }
@@ -101,9 +109,12 @@ int ra_network_send_receive(const char *server_url,
 
     int wrote = 0;
     int read = 0;
-    wrote = boost::asio::write(s, 
-                               boost::asio::buffer(p_req, 
-                               p_req->size + sizeof (ra_samp_request_header_t)));
+    while(wrote < (p_req->size + sizeof (ra_samp_request_header_t))){
+        wrote += send(sock, 
+                      p_req + wrote, 
+                      p_req->size + sizeof (ra_samp_request_header_t) - wrote,
+                      0);
+    }
 
     PRINT("Wrote %d bytes of Msg %d declared size %d\n", wrote, p_req->type, p_req->size);
 
@@ -116,8 +127,11 @@ int ra_network_send_receive(const char *server_url,
         PRINT("Msg %d success\n", p_req->type);
     }
 
-    read = boost::asio::read(s,
-                             boost::asio::buffer(reply, sizeof(ra_samp_response_header_t)));
+    read = recv(sock,
+                reply, 
+                sizeof(ra_samp_response_header_t),
+                0);
+    
     PRINT("Read %d bytes \n", read);
 
     ra_samp_response_header_t* reply_header = (ra_samp_response_header_t*) reply;
@@ -127,9 +141,10 @@ int ra_network_send_receive(const char *server_url,
         PRINT("Reading the rest of the message\n");
         read = 0;
         while(read < reply_header->size){
-            read += boost::asio::read(s,
-                                 boost::asio::buffer(reply + sizeof(ra_samp_response_header_t) + read, 
-                                 reply_header->size - read)); 
+            read += recv(sock,
+                         reply + sizeof(ra_samp_response_header_t) + read, 
+                         reply_header->size - read,
+                         0); 
         }
         *p_resp = (ra_samp_response_header_t*) reply;
         PRINT("Setting the response pointer to %d\n", reply);
