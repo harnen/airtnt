@@ -772,6 +772,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
                         &p_att_result_msg->secret.payload_tag);
         }
 
+        #ifdef MYDEBUG 
         printf("ENCRYPTION KEY: ");
         for (int i = 0; i < 16; ++i)
         {
@@ -779,9 +780,15 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
         }
         printf("\n");
         printf("PLAINTEXT SIZE: %d\n", ocr_input_size);
+        printf("CIPHERTEXTS: ");
+        for (int i = 0; i < ocr_input_size; ++i)
+        {
+            printf("%d ", p_att_result_msg->secret.payload[i]);
+        }
+        printf("\n");
 
 
-        #ifdef MYDEBUG 
+        
         printf("Printing size: %d\n", ocr_input_size);
         printf("Printing payload:\n");
         for (int i = 0; i < ocr_input_size; ++i) {
