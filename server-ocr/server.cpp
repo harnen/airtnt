@@ -169,6 +169,7 @@ int main(int argc , char *argv[]) {
             
             iter_counter = 0;
             ra_free_network_response_buffer(p_resp_full);
+            close(socket_desc); close(client_sock);
             exit(0);
           }
 
