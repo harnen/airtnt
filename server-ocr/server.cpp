@@ -135,8 +135,11 @@ int main(int argc , char *argv[]) {
         } 
 
         // read body
-        read_size = recv(client_sock, client_message+sizeof(ra_samp_request_header_t), header->size, 0); 
-        PRINT("[server] Received body size: %d\n", read_size);
+        read_size = 0;
+        while(read_size < header->size) {
+            read_size += recv(client_sock, client_message+sizeof(ra_samp_request_header_t)+read_size, header->size-read_size, 0); 
+            PRINT("[server] Received body size: %d\n", read_size);
+        }
         if (header->size != read_size) {
             PRINT("[ERROR][server] Received size: %d, while expecting: %d\n", read_size, header->size);
             return -1;
