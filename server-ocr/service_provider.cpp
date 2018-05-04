@@ -778,6 +778,8 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
             printf("%d ", g_sp_db.sk_key[i]);
         }
         printf("\n");
+        printf("PLAINTEXT SIZE: %d\n", ocr_input_size);
+
 
         #ifdef MYDEBUG 
         printf("Printing size: %d\n", ocr_input_size);
