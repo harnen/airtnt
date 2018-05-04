@@ -15,7 +15,7 @@ typedef struct ocr_input
 {
     uint8_t rows;
     uint8_t cols;
-    char payload[]; 
+    int payload[]; 
 } ocr_input_t;
 
 
