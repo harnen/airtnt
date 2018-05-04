@@ -405,31 +405,56 @@ sgx_status_t put_secret_data(
          * Perform the requested computations
          */
 
-        ocr_input_t* input = (ocr_input_t*) g_secret;
+        /*ocall_print("\n Encryption key:");
+        for(int i = 0; i < 16; i++){
+            ocall_print_int(sk_key[i]);
+        }
+       
+        ocall_print("encryption payload size:");
+        ocall_print_int(secret_size);*/
+ 
+
+        ocr_input_t* input  = (ocr_input_t*) g_secret;
         int ocr_input_size = sizeof(ocr_input_t) + (input->rows * input->cols * sizeof(int));
-    
+        uint8_t* input_ptr = (uint8_t*) input->payload;
+   
+/*        ocall_print("\nDecrypted input"); 
+        for(int i = 0; i < secret_size; i++){
+            ocall_print_int(g_secret[i]);
+        }*/
+
+/*        ocall_print("\ninput->rows"); ocall_print_int(input->rows); 
+        ocall_print("\ni;nput->cols"); ocall_print_int(input->cols); 
+        ocall_print("\ninput->payload");
+        ocall_print("\ninput->payload"); 
+        for(int i = 0; i < (input->rows * input->cols); i++){
+            ocall_print_int(input->payload[i]);
+        }*/
 
         character_recognition_wrap(input, ocr_input_size, letters_c, letters_rows, output_letters, length);
 
+        ocall_print("\nFound letters"); 
+        for(int i = 0; i < *length; i++){
+            ocall_print_char(output_letters[i]);
+        }
         /*
          * Encrypt the computed results
          */
-        /**result_size = sizeof(sgx_aes_gcm_128bit_key_t);
        
         //generate a random encryption key
         sgx_read_rand((unsigned char*) result_key, sizeof(*result_key)); 
 
         //initialization vector - we keep it everywhere the same for now
         uint8_t result_iv[12] = {0};
-        uint8_t buf[secret_size];
+        uint8_t buf[*length];
 
         for(int i = 0; i < SGX_AESGCM_KEY_SIZE; i++){
             (*result_key)[i] = i;
         }
         //encrypt with a random key
         sgx_rijndael128GCM_encrypt(result_key,
-                                    (uint8_t*) input, //
-                                    secret_size, //output is the same size as the input
+                                    (uint8_t*) output_letters, //
+                                    *length, //output is the same size as the input
                                     buf,
                                     &result_iv[0],
                                     12,          //recommended value
@@ -445,16 +470,16 @@ sgx_status_t put_secret_data(
     
         //encrypt with the original key derived from remote attestation  
         sgx_rijndael128GCM_encrypt(&sk_key, //&shared_key,
-                                    buf, //(const uint8_t*) input,
-                                    secret_size, //output is the same size as the input
-                                    result,
+                                    (uint8_t*) buf, //(const uint8_t*) input,
+                                    *length, //output is the same size as the input
+                                    (uint8_t*) output_letters,
                                     &result_iv[0],
                                     12,          //recommended value
                                     NULL,
                                     0,
                                     out_mac);
 
-        free(g_secret);*/
+        free(g_secret);
 
     } while(0);
     return ret;

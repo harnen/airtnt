@@ -1030,6 +1030,15 @@ int sp_ra_proc_msg_output_req(const char *p_output,
     printf("\n");
     #endif
 
+    #ifdef MYDEBUG 
+    ocr_input_t* ocr_input2 = (ocr_input_t*) buf_test;
+    printf("Test dect payload: \n");
+    for (int i = 0; i < ocr_input_size; ++i)
+    {
+        printf("%d ", ocr_input2->payload[i]);
+    }
+    printf("\n");
+    #endif
 
     memcpy(rep_buffer + sizeof(ra_samp_response_header_t), ebuf, ocr_input_size);
 

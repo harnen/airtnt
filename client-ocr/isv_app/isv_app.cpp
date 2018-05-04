@@ -92,6 +92,17 @@ uint8_t* attestation_msg_samples[] =
 
 using namespace std;
 
+void ocall_print_char(int data) {
+   printf("%c\n", data);
+}
+
+void ocall_print_int(int data) {
+   printf("%d ", data);
+}
+
+void ocall_print(const char* str) {
+   printf("%s\n", str);
+}
 
 void PRINT_BYTE_ARRAY(
     FILE *file, void *mem, uint32_t len)

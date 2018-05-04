@@ -62,5 +62,10 @@ enclave {
 
 
     };
+   untrusted {
+        void ocall_print_char(int data);
+        void ocall_print_int(int data);
+        void ocall_print([in, string]const char* str);
+   };
 
 };

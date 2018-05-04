@@ -45,8 +45,8 @@ extern "C" {
 
 typedef struct life_input
 {
-    uint8_t size;
-    uint8_t steps;
+    int size;
+    int steps;
     char array[]; 
 } life_input_t;
 
