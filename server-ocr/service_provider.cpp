@@ -773,6 +773,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
         }
 
         #ifdef MYDEBUG 
+        printf("PLAINTEXT & CIPHERTEXTS SIZE: %d\n", ocr_input_size);
         printf("ENCRYPTION KEY: ");
         for (int i = 0; i < 16; ++i)
         {
@@ -780,15 +781,14 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
         }
         printf("\n");
 
-        printf("PLAINTEXT & CIPHERTEXTS SIZE: %d\n", ocr_input_size);
-
+        printf("PLAINTEXT ROWS: %d, PLAINTEXT COLS: %d\n", ocr_input->rows, ocr_input->cols);
         printf("PLAINTEXT: ");
         for (int i = 0; i < ocr_input_size; ++i)
         {
             printf("%d ", ocr_input->payload[i]);
         }
         printf("\n");
-
+        
         printf("CIPHERTEXTS: ");
         for (int i = 0; i < ocr_input_size; ++i)
         {
