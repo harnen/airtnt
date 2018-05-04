@@ -74,7 +74,10 @@ int main(int argc , char *argv[]) {
         PRINT("[server] Could not create socket\n");
     }
     PRINT("[server] Socket created\n");
-     
+    int option = 1;
+    setsockopt(socket_desc, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
+    setsockopt(socket_desc, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
+        
     // prepare the sockaddr_in structure
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
@@ -170,7 +173,7 @@ int main(int argc , char *argv[]) {
             
             iter_counter = 0;
             ra_free_network_response_buffer(p_resp_full);
-            close(client_sock);
+            close(client_sock); close(socket_desc);
             exit(0);
           }
 

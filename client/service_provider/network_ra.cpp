@@ -37,7 +37,6 @@
 #include "network_ra.h"
 #include "service_provider.h"
 
-#include <boost/asio.hpp>
 #include <iostream>
 #include "chat_message.hpp"
 #include "../isv_app/misc.h"

@@ -7,7 +7,7 @@ SFML = -lsfml-graphics -lsfml-window -lsfml-system
 all: server
 
 server: server.cpp ecp.cpp ias_ra.cpp network_ra.cpp service_provider.cpp crypto.cpp
-	g++ -o server server.cpp ecp.cpp ias_ra.cpp network_ra.cpp service_provider.cpp crypto.cpp \
+	g++ -o server -g server.cpp ecp.cpp ias_ra.cpp network_ra.cpp service_provider.cpp crypto.cpp \
 	./lib/Letter.cpp ./lib/image_util.cpp ./lib/processing.cpp \
 	$(CPP_FLAGS) $(LINK_FLAGS) $(SFML)
 
