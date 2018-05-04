@@ -280,3 +280,28 @@ void character_recognition_wrap(ocr_input_t* ocr_input, size_t ocr_input_size, i
 }
 
 
+// getters and setters
+char Letter2::getLetter() const {
+	return letter;
+}
+void Letter2::setLetter(char letter) {
+	this->letter = letter;
+}
+int Letter2::getX() const {
+	return x;
+}
+void Letter2::setX(int x) {
+	this->x = x;
+}
+int Letter2::getY() const {
+	return y;
+}
+void Letter2::setY(int y) {
+	this->y = y;
+}
+const vector< vector<int> >& Letter2::getMatrix() const {
+	return matrix;
+}
+void Letter2::setMatrix(const vector< vector<int> >& matrix) {
+	this->matrix = matrix;
+}

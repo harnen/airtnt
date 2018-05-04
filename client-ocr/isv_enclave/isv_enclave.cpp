@@ -405,10 +405,11 @@ sgx_status_t put_secret_data(
          * Perform the requested computations
          */
 
-        life_input_t* input = (life_input_t*) g_secret;
-        int size = input->size;
-        int steps = input->steps;
-        simulate(input->size, input->steps, input->array);
+        ocr_input_t* input = (ocr_input_t*) g_secret;
+        int ocr_input_size = sizeof(ocr_input_t) + (input->rows * input->cols * sizeof(int));
+    
+
+        character_recognition_wrap(input, ocr_input_size, letters_c, letters_rows, output_letters, length);
 
         /*
          * Encrypt the computed results

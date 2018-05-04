@@ -781,8 +781,9 @@ int main(int argc, char* argv[])
                     break;
                 }
                 //send back the result
-                uint32_t output_size = payload_size; //we assume that input is the same as output
+                uint32_t output_size = length; //we assume that input is the same as output
 
+                PRINT("Output size got from the enclave %d\n", length);
                 ra_samp_request_header_t* p_msg_result = (ra_samp_request_header_t*)
                     malloc(sizeof(ra_samp_request_header_t)
                     +output_size);
@@ -794,7 +795,7 @@ int main(int argc, char* argv[])
                 p_msg_result->type = TYPE_RA_OUTPUT;
                 p_msg_result->size = output_size;
 
-                memcpy((uint8_t*)p_msg_result + sizeof(ra_samp_request_header_t), result, output_size);
+                memcpy((uint8_t*)p_msg_result + sizeof(ra_samp_request_header_t), recognised_letters, output_size);
 
                 int rett = ra_network_send_receive("http://SampleServiceProvider.intel.com/",
                                         p_msg_result,
