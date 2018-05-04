@@ -61,14 +61,12 @@ int main(int argc , char *argv[]) {
     ocr_input_t* ocr_input = (ocr_input_t*)malloc(ocr_input_size);
     ocr_input->rows = rows;
     ocr_input->cols = cols;
-    /*
     for (int i=0; i < rows; ++i) {
         for (int j=0; j < cols; ++j) {
             ocr_input->payload[i*rows+j] = input[i][j];
         }
     }
-    */
-    memcpy(ocr_input->payload, input, rows*cols*sizeof(int));
+    //memcpy(ocr_input->payload, input, rows*cols*sizeof(int));
     PRINT("[server] OCR Image size: %d (rows: %d, cols: %d)\n", ocr_input_size, rows, cols);
      
     // create socket
