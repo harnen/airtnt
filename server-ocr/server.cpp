@@ -136,9 +136,8 @@ int main(int argc , char *argv[]) {
 
         // read body
         read_size = 0;
-        int received_size = client_message+sizeof(ra_samp_request_header_t);
         while(read_size < header->size) {
-            read_size += recv(client_sock, received_size + read_size, header->size - read_size, 0); 
+            read_size += recv(client_sock, client_message+sizeof(ra_samp_request_header_t) + read_size, header->size - read_size, 0); 
             PRINT("[server] Received body size: %d\n", read_size);
         }
         if (header->size != read_size) {
