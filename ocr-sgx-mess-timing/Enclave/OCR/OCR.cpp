@@ -9,10 +9,71 @@
 #include <string>
 #include "../../lib/Letter.h"
 
-#include "ocr.h"
-#include "ocr_type.h"
 
 
+class Letter2 {
+private:
+	/**
+	 * The char ascii value of the character represented by this letter class.  Defaults to * if
+	 * the character is unknown (for instance, in the case of unscanned letters)
+	 */
+	char letter;
+
+	/**
+	 * A matrix containing
+	 */
+	vector< vector<int> > matrix;
+
+	/**
+	 * The x and y coordinates in the parent matrix of where the matrix was found
+	 */
+	int x;
+	int y;
+
+public:
+	//Initialize a new letter from a matrix
+	Letter2(vector< vector<int> > matrix);
+
+	//Getters and setters
+	char getLetter() const;
+	void setLetter(char letter);
+	const vector<vector<int> >& getMatrix() const;
+	void setMatrix(const vector<vector<int> >& matrix);
+
+	int getX() const;
+	void setX(int x);
+	int getY() const;
+	void setY(int y);
+
+	void exportLetter(int data[]);
+	static Letter2 importLetter(const int data[], const int rows, const int cols);
+};
+
+// getters and setters
+char Letter2::getLetter() const {
+	return letter;
+}
+void Letter2::setLetter(char letter) {
+	this->letter = letter;
+}
+int Letter2::getX() const {
+	return x;
+}
+void Letter2::setX(int x) {
+	this->x = x;
+}
+int Letter2::getY() const {
+	return y;
+}
+void Letter2::setY(int y) {
+	this->y = y;
+}
+const vector< vector<int> >& Letter2::getMatrix() const {
+	return matrix;
+}
+void Letter2::setMatrix(const vector< vector<int> >& matrix) {
+	this->matrix = matrix;
+}
 
 // initialize a new letter object
 Letter2::Letter2(vector< vector<int> > matrix) {
@@ -122,13 +183,13 @@ void test_function(int* a, int* b, int* c) {
     *c = *a + *b;
 }
 void test_function_2(const char *arr[], size_t len) {
-	ocall_print("Start example function 2...");
+	//ocall_print("Start example function 2...");
 
     vector<string> v(arr, arr+len);
 
-    ocall_print(v[0].c_str());
-    ocall_print(v[1].c_str());
-    ocall_print("End example function 2");
+    //ocall_print(v[0].c_str());
+    //ocall_print(v[1].c_str());
+    //ocall_print("End example function 2");
 }
 void test_function_3(const int *arr[], size_t rows, size_t cols) {
 	ocall_print("Start example function 3...");
@@ -143,7 +204,7 @@ void test_function_3(const int *arr[], size_t rows, size_t cols) {
     }
 
 
-    ocall_print("End example function 3\n\n");
+    //ocall_print("End example function 3\n\n");
 }
 
 
@@ -154,21 +215,17 @@ void detect_letter(vector thresholdInputPixels, int* out){
 */
 
 
-void character_recognition_wrap(ocr_input_t* ocr_input, size_t ocr_input_size, int** letters_c, int letters_rows, 
+void character_recognition_wrap(int** input, int rows, int cols, int** letters_c, int letters_rows, 
 	char *output_letters, int *length) {
 
 	//////////////////////////////////////////
 	// convert input to vector
 	//////////////////////////////////////////
-	int rows = ocr_input->rows;
-	int cols = ocr_input->cols;
-
 	vector< vector<int> > input_image;
 	input_image.resize(rows, vector<int>(cols, 0));
 	for (int i=0; i < rows; i++) {
     	for (int j=0; j < cols; j++) {
-        	//input_image[i][j] = input[i][j];
-        	input_image[i][j] = ocr_input->payload[i*rows+j];
+        	input_image[i][j] = input[i][j];
         }
     }
     

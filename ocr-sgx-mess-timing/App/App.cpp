@@ -13,8 +13,6 @@
 
 #include <string>
 
-#include "ocr.h"
-
 //using namespace std;
 
 
@@ -34,8 +32,6 @@ void ocall_print_int(int data) {
 void ocall_print_char(int data) {
     printf("%c\n", data);
 }
-
-
 
 
 /* 
@@ -118,8 +114,8 @@ int main(int argc, char const *argv[]) {
         return inner_vec.data();
     });
     test_function_3(global_eid, internal_v3.data(), v3.size(), v3[0].size());
-
     */
+
 
     /*****************************
      * OCR
@@ -146,20 +142,39 @@ int main(int argc, char const *argv[]) {
     vector<Letter> letters;
     load_template(&letters, alphabet_length);
 
+    // test vectors
+    const char* test_vectors[15];
+    test_vectors[0] = "./data/test/test_input_1.png";
+    test_vectors[1] = "./data/test/test_input_2.png";
+    test_vectors[2] = "./data/test/test_input_3.png";
+    test_vectors[3] = "./data/test/test_input_4.png";
+    test_vectors[4] = "./data/test/test_input_5.png";
+    test_vectors[5] = "./data/test/test_input_6.png";
+    test_vectors[6] = "./data/test/test_input_7.png";
+    test_vectors[7] = "./data/test/test_input_8.png";
+    test_vectors[8] = "./data/test/test_input_9.png";
+    test_vectors[9] = "./data/test/test_input_10.png";
+    test_vectors[10] = "./data/test/test_input_11.png";
+    test_vectors[11] = "./data/test/test_input_12.png";
+    test_vectors[12] = "./data/test/test_input_13.png";
+    test_vectors[13] = "./data/test/test_input_14.png";
+    test_vectors[14] = "./data/test/test_input_15.png";
 
 
-       
+
+    // inputs
+    for (int i = 0; i < 15; ++i)
+    {
+
         // load input
-        //char image_input[100];
-        //sprintf(image_input, "./data/test/test_input_%d.png", i);
-      
-        char const *image_input = "./data/input_5_OK.png";
+        //char const *image_input = "./data/input_5_OK.png";
+        char const *image_input = test_vectors[i];
         vector< vector<int> > pixels;
         if (load_image(image_input, &pixels) != 0) {
             printf("Could not load input image: %s\n", image_input);
             return -1;
         }
-
+        
         // convert input to C type for ECALL
         vector<int*> ptrs;
         transform(begin(pixels), end(pixels), back_inserter(ptrs), [](vector<int> &inner_vec) {
@@ -168,18 +183,6 @@ int main(int argc, char const *argv[]) {
         int **input =  ptrs.data();
         int rows = pixels.size();
         int cols = pixels[0].size();
-
-
-        // convert to 1d array
-        unsigned long ocr_input_size = sizeof(ocr_input_t) + (rows * cols * sizeof(int));
-        ocr_input_t* ocr_input = (ocr_input_t*)malloc(ocr_input_size);
-        ocr_input->rows = rows;
-        ocr_input->cols = cols;
-        for (int i=0; i < rows; ++i) {
-            for (int j=0; j < cols; ++j) {
-                ocr_input->payload[i*rows+j] = input[i][j];
-            }
-        }
 
 
         //for (int i = 0; i < rows; i++) {printf("%d\n", input[i][0]);}
@@ -215,8 +218,7 @@ int main(int argc, char const *argv[]) {
         // perform OCR on input
         char recognised_letters[100]; // make array big enough
         int length;
-        //character_recognition_wrap(global_eid, input, rows, cols, letters_c, letters_rows, recognised_letters, &length);
-        character_recognition_wrap(global_eid, ocr_input, ocr_input_size, letters_c, letters_rows, recognised_letters, &length);
+        character_recognition_wrap(global_eid, input, rows, cols, letters_c, letters_rows, recognised_letters, &length);
 
         /*********************** END ECALL ***********************/
 
@@ -231,9 +233,8 @@ int main(int argc, char const *argv[]) {
 
         // free mem
         pixels.clear();
-    
 
-
+    }
 
     
     /*****************************
