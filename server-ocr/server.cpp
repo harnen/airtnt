@@ -63,7 +63,7 @@ int main(int argc , char *argv[]) {
     ocr_input->cols = cols;
     for (int i=0; i < rows; ++i) {
         for (int j=0; j < cols; ++j) {
-            ocr_input->payload[i*rows+j] = input[i][j];
+            ocr_input->payload[j*rows+i] = input[i][j];
         }
     }
     /*
