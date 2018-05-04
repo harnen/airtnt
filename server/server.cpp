@@ -123,7 +123,7 @@ void session(tcp::socket sock)
       while(wrote_bytes < sizeof(ra_samp_response_header_t) + p_msg0_resp_full->size) {
         wrote_bytes += boost::asio::write(sock, boost::asio::buffer(
           p_msg0_resp_full + wrote_bytes, 
-          sizeof(ra_samp_response_header_t) + p_msg0_resp_full->size) - wrote_bytes
+          sizeof(ra_samp_response_header_t) + p_msg0_resp_full->size - wrote_bytes)
         );
       }
 
