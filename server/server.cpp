@@ -116,14 +116,19 @@ void session(tcp::socket sock)
       printf("Response type: %d\n", p_msg0_resp_full->type);
       #endif 
 
-      int wrote = 0;
+
       // wirte to dump to socket
-      wrote = boost::asio::write(sock, boost::asio::buffer(
-        p_msg0_resp_full, 
-        sizeof(ra_samp_response_header_t) + p_msg0_resp_full->size)
-      );
+
+      int wrote_bytes=0;
+      while(wrote_bytes < sizeof(ra_samp_response_header_t) + p_msg0_resp_full->size) {
+        wrote_bytes += boost::asio::write(sock, boost::asio::buffer(
+          p_msg0_resp_full + wrote_bytes, 
+          sizeof(ra_samp_response_header_t) + p_msg0_resp_full->size) - wrote_bytes
+        );
+      }
+
+
       #ifdef MYDEBUG 
-      printf("Actual write: %d\n", wrote);
       printf("Hoped write: %d\n", sizeof(ra_samp_response_header_t) + p_msg0_resp_full->size);
       #endif 
 
