@@ -157,7 +157,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
 int sp_ra_free_msg2(
     sample_ra_msg2_t *p_msg2);
 
-int sp_ra_proc_msg_output_req(const life_input_t *p_output, 
+int sp_ra_proc_msg_output_req(const char *p_output, 
                                 uint32_t output_size, ra_samp_response_header_t **pp_att_result_msg,
                                 int steps, 
                                 int max_iterations,
