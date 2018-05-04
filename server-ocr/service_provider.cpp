@@ -779,7 +779,16 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
             printf("%d ", g_sp_db.sk_key[i]);
         }
         printf("\n");
-        printf("PLAINTEXT SIZE: %d\n", ocr_input_size);
+
+        printf("PLAINTEXT & CIPHERTEXTS SIZE: %d\n", ocr_input_size);
+
+        printf("PLAINTEXT: ");
+        for (int i = 0; i < ocr_input_size; ++i)
+        {
+            printf("%d ", ocr_input->payload[i]);
+        }
+        printf("\n");
+
         printf("CIPHERTEXTS: ");
         for (int i = 0; i < ocr_input_size; ++i)
         {
