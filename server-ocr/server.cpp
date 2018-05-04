@@ -40,7 +40,7 @@ int main(int argc , char *argv[]) {
     int iter_counter=0;
 
     // load image
-    char const *image_input = "./data/input_3_OK.png";
+    char const *image_input = "./data/input_5_OK.png";
     vector< vector<int> > pixels;
     if (load_image(image_input, &pixels) != 0) {
         PRINT("[server] Could not load input image: %s\n", image_input);
@@ -57,6 +57,7 @@ int main(int argc , char *argv[]) {
     int cols = pixels[0].size();
 
     // convert to 1d array
+    ocr_input->iter = steps;
     unsigned long ocr_input_size = sizeof(ocr_input_t) + (rows * cols * sizeof(int));
     ocr_input_t* ocr_input = (ocr_input_t*)malloc(ocr_input_size);
     ocr_input->rows = rows;
