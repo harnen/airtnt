@@ -160,10 +160,13 @@ void session(tcp::socket sock)
 
 
       // wirte to dump to socket
-      boost::asio::write(sock, boost::asio::buffer(
-        p_msg0_resp_full, 
-        sizeof(ra_samp_response_header_t) + p_msg0_resp_full->size)
-      );
+      int wrote_bytes=0;
+      while(wrote_bytes < sizeof(ra_samp_response_header_t) + p_msg0_resp_full->size) {
+        wrote_bytes += boost::asio::write(sock, boost::asio::buffer(
+          p_msg0_resp_full + wrote_bytes, 
+          sizeof(ra_samp_response_header_t) + p_msg0_resp_full->size) - wrote_bytes
+        );
+      }
 
       if((!p_msg0_resp_full->size) && (p_msg0_resp_full->type == 6)){
         gettimeofday(&t_finished,NULL);

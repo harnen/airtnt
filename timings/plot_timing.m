@@ -36,7 +36,7 @@ for i=1:length(matrix_sizes)
     % compute avg and std
     mean_total_time(:,i) = mean(total_time,2);
     mean_enclave_time(:,i) = mean(enclave_time,2);
-    std_total_time(:,i) = std(total_time,[],2)
+    std_total_time(:,i) = std(total_time,[],2);
     std_enclave_tim(:,i) = std(enclave_time,[],2);
     
 end
