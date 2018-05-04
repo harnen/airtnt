@@ -40,7 +40,7 @@ int main(int argc , char *argv[]) {
     int iter_counter=0;
 
     // load image
-    char const *image_input = "./data/input_5_OK.png";
+    char const *image_input = "./data/input_3_OK.png";
     vector< vector<int> > pixels;
     if (load_image(image_input, &pixels) != 0) {
         PRINT("[server] Could not load input image: %s\n", image_input);
@@ -66,6 +66,11 @@ int main(int argc , char *argv[]) {
             ocr_input->payload[i*rows+j] = input[i][j];
         }
     }
+    /*
+    uint8_t* ocr_input_byte = (uint8_t*) ocr_input;
+    uint8_t* input_byte = (uint8_t*) input;
+    memcpy(ocr_input_byte+2*sizeof(int), input_byte, rows*cols*sizeof(int));
+    */
     PRINT("[server] OCR Image size: %d (rows: %d, cols: %d)\n", ocr_input_size, rows, cols);
      
     // create socket
@@ -75,7 +80,6 @@ int main(int argc , char *argv[]) {
     }
     PRINT("[server] Socket created\n");
     int option = 1;
-    setsockopt(socket_desc, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
     setsockopt(socket_desc, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
         
     // prepare the sockaddr_in structure
@@ -136,8 +140,15 @@ int main(int argc , char *argv[]) {
         } 
 
         // read body
-        read_size = recv(client_sock, client_message+sizeof(ra_samp_request_header_t), header->size, 0); 
-        PRINT("[server] Received body size: %d\n", read_size);
+        read_size = 0;
+        while(read_size < header->size) {
+            read_size += recv(
+                client_sock, 
+                client_message+sizeof(ra_samp_request_header_t) + read_size, 
+                header->size - read_size, 0
+            ); 
+            PRINT("[server] Received body size: %d\n", read_size);
+        }
         if (header->size != read_size) {
             PRINT("[ERROR][server] Received size: %d, while expecting: %d\n", read_size, header->size);
             return -1;
