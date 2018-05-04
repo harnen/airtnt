@@ -10,6 +10,16 @@
     #define PRINT(...) 
 #endif
 
+
+typedef struct ocr_input
+{
+    uint8_t rows;
+    uint8_t cols;
+    char payload[]; 
+} ocr_input_t;
+
+
+
 #endif // MISC_H
 
 

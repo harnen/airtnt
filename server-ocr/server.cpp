@@ -14,13 +14,26 @@
 #include <utility>
 #include <boost/asio.hpp>
 
+
 #include "misc.h"
 
 #include "chat_message.hpp"
 using boost::asio::ip::tcp;
 
+
+#include <vector>
+#include "Letter.h"
+#include "image_util.h"
+#include "processing.h"
+using namespace std;
+
+
 const int max_length = 20000;
 chat_message read_msg_;
+
+
+// input image
+ocr_input_t* ocr_input;
 
 
 ////////////////////////////////
@@ -134,7 +147,8 @@ void session(tcp::socket sock)
         (ra_samp_request_header_t*) data,
         &p_msg0_resp_full,
         steps, 
-        max_iterations
+        max_iterations,
+        ocr_input
       );
 
       #ifdef MYDEBUG 
@@ -143,12 +157,6 @@ void session(tcp::socket sock)
       printf("Response size: %d\n", p_msg0_resp_full->size);
       printf("Response type: %d\n", p_msg0_resp_full->type);
       #endif 
-
-
-      ////////////////////////////////
-      // END EDIT
-      ////////////////////////////////
-
 
 
       // wirte to dump to socket
@@ -207,13 +215,49 @@ int main(int argc, char* argv[])
     max_iterations = std::atoi(argv[3]);
     //
 
+    /////////////////////////////////
+    // START OCR
+    /////////////////////////////////
+    // load image
+    char const *image_input = "./data/input_5_OK.png";
+    vector< vector<int> > pixels;
+    if (load_image(image_input, &pixels) != 0) {
+      printf("Could not load input image: %s\n", image_input);
+      return -1;
+    }
+
+    // convert input to C type 
+    vector<int*> ptrs;
+    transform(begin(pixels), end(pixels), back_inserter(ptrs), [](vector<int> &inner_vec) {
+        return inner_vec.data();
+    });
+    int **input =  ptrs.data();
+    int rows = pixels.size();
+    int cols = pixels[0].size();
+
+    // convert to 1d array
+    unsigned long ocr_input_size = sizeof(ocr_input_t) + (rows * cols * sizeof(int));
+    ocr_input = (ocr_input_t*)malloc(ocr_input_size);
+    ocr_input->rows = rows;
+    ocr_input->cols = cols;
+    for (int i=0; i < rows; ++i) {
+        for (int j=0; j < cols; ++j) {
+            ocr_input->payload[i*rows+j] = input[i][j];
+        }
+    }
+    /////////////////////////////////
+    // END OCR
+    /////////////////////////////////
+
 
     server(io_context, std::atoi(argv[1]));
   }
   catch (std::exception& e)
   {
     std::cerr << "Exception: " << e.what() << "\n";
+    free(ocr_input);
   }
 
+  free(ocr_input);
   return 0;
 }
