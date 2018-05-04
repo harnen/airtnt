@@ -40,7 +40,7 @@ int main(int argc , char *argv[]) {
     int iter_counter=0;
 
     // load image
-    char const *image_input = "./data/input_4_OK.png";
+    char const *image_input = "./data/input_5_OK.png";
     vector< vector<int> > pixels;
     if (load_image(image_input, &pixels) != 0) {
         PRINT("[server] Could not load input image: %s\n", image_input);
