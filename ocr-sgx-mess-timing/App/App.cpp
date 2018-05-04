@@ -13,6 +13,10 @@
 
 #include <string>
 
+// timing
+#include <time.h>
+#include <sys/time.h>
+
 //using namespace std;
 
 
@@ -165,6 +169,9 @@ int main(int argc, char const *argv[]) {
     // inputs
     for (int i = 0; i < 15; ++i)
     {
+        struct timeval t_connected, t_finished;
+        gettimeofday(&t_connected,NULL);
+        unsigned long m_started = 1000000 * t_connected.tv_sec + t_connected.tv_usec;
 
         // load input
         //char const *image_input = "./data/input_5_OK.png";
@@ -224,6 +231,11 @@ int main(int argc, char const *argv[]) {
 
 
         // print result
+        gettimeofday(&t_finished,NULL);
+        unsigned long m_finished = 1000000 * t_finished.tv_sec + t_finished.tv_usec;
+        printf("Time started [us] %lu, time finished [us] %lu, time diff [us] %lu\n", 
+            m_started, m_finished, m_finished - m_started
+        );
         printf("\nOCR output: ");
         for (int i = 0; i < length; i++) {
             printf("%c", recognised_letters[i]);
