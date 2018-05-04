@@ -164,8 +164,10 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
                                 ocr_input_t* ocr_input
                                 );
 
+/*
 int sp_ra_proc_msg_input_req(const sample_ra_msg_input_t *p_msg3, uint32_t msg3_size,
     ra_samp_response_header_t **pp_att_result_msg);
+*/
 
 typedef int (*sample_enroll)(int sp_credentials, sample_spid_t* spid,
     int* authentication_token);

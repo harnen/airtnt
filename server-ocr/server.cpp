@@ -255,7 +255,9 @@ int main(int argc, char* argv[])
   catch (std::exception& e)
   {
     std::cerr << "Exception: " << e.what() << "\n";
+    free(ocr_input);
   }
 
+  free(ocr_input);
   return 0;
 }

@@ -152,7 +152,7 @@ int ra_network_send_receive(const char *server_url,
         break;
 
 
-
+    /*
     case TYPE_RA_INPUT:
         ret = sp_ra_proc_msg_input_req(
             (const sample_ra_msg_input_t*)((uint8_t*)p_req+sizeof(ra_samp_request_header_t)),
@@ -171,7 +171,7 @@ int ra_network_send_receive(const char *server_url,
             *p_resp = p_resp_msg;
         }
         break;
-
+    */
     default:
         ret = -1;
         fprintf(stderr, "\nError, unknown ra message type. Type = %d [%s].",

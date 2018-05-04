@@ -113,8 +113,10 @@ static int g_sp_credentials = 0;
 static int g_authentication_token = 0;
 
 //uint8_t g_secret[8] = {0,1,2,3,4,5,6,7};
-unsigned int size = 100;
-unsigned long msg_size = sizeof(life_input_t) + (size * size * sizeof(char));
+//unsigned int size = 100;
+//unsigned long msg_size = sizeof(life_input_t) + (size * size * sizeof(char));
+
+
 
 sample_spid_t g_spid;
 
@@ -458,6 +460,10 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
 )
 {
 
+    unsigned long ocr_input_size = sizeof(ocr_input_t) + (ocr_input->rows * ocr_input->cols * sizeof(int));
+
+
+
     int ret = 0;
     sample_status_t sample_ret = SAMPLE_SUCCESS;
     const uint8_t *p_msg3_cmaced = NULL;
@@ -626,7 +632,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
         uint32_t att_result_msg_size = sizeof(sample_ra_att_result_msg_t);
         p_att_result_msg_full =
             (ra_samp_response_header_t*)malloc(att_result_msg_size
-            + sizeof(ra_samp_response_header_t) + msg_size);
+            + sizeof(ra_samp_response_header_t) + ocr_input_size);
         if(!p_att_result_msg_full)
         {
             fprintf(stderr, "\nError, out of memory in [%s].", __FUNCTION__);
@@ -634,9 +640,9 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
             break;
         }
         memset(p_att_result_msg_full, 0, att_result_msg_size
-               + sizeof(ra_samp_response_header_t) + msg_size);
+               + sizeof(ra_samp_response_header_t) + ocr_input_size);
         p_att_result_msg_full->type = TYPE_RA_ATT_RESULT;
-        p_att_result_msg_full->size = att_result_msg_size + msg_size;
+        p_att_result_msg_full->size = att_result_msg_size + ocr_input_size;
         if(IAS_QUOTE_OK != attestation_report.status)
         {
             p_att_result_msg_full->status[0] = 0xFF;
@@ -727,8 +733,9 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
         }
 
         // Generate shared secret and encrypt it with SK, if attestation passed.
-       
+        
     
+        /*
         life_input_t* input = (life_input_t*) malloc(msg_size);
         input->size = size;
         input->steps = steps;
@@ -746,16 +753,17 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
             printf("\n");
         } 
         #endif
+        */
 
         uint8_t aes_gcm_iv[SAMPLE_SP_IV_SIZE] = {0};
-        p_att_result_msg->secret.payload_size = msg_size;
+        p_att_result_msg->secret.payload_size = ocr_input_size;
         if((IAS_QUOTE_OK == attestation_report.status) &&
            (IAS_PSE_OK == attestation_report.pse_status) &&
            (isv_policy_passed == true))
         {
             ret = sample_rijndael128GCM_encrypt(&g_sp_db.sk_key,
                         (uint8_t*) ocr_input,
-                        msg_size,
+                        ocr_input_size,
                         p_att_result_msg->secret.payload,
                         &aes_gcm_iv[0],
                         SAMPLE_SP_IV_SIZE,
@@ -765,9 +773,9 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
         }
 
         #ifdef MYDEBUG 
-        printf("Printing size: %d\n", msg_size);
+        printf("Printing size: %d\n", ocr_input_size);
         printf("Printing payload:\n");
-        for (int i = 0; i < msg_size; ++i) {
+        for (int i = 0; i < ocr_input_size; ++i) {
             printf("%d ", p_att_result_msg->secret.payload[i]);
         }
         printf("\n");
@@ -807,6 +815,8 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
                                 int steps, int max_iterations, ocr_input_t* ocr_input
 )
 {
+
+    unsigned long ocr_input_size = sizeof(ocr_input_t) + (ocr_input->rows * ocr_input->cols * sizeof(int));
 
     uint8_t iv[12] = {0};
     #ifdef MYDEBUG 
@@ -851,7 +861,7 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
    
     #ifdef MYDEBUG 
     printf("Decrypted on service provider: ");
-    for(int i = 0; i < msg_size; i++){
+    for(int i = 0; i < ocr_input_size; i++){
         printf("%d,", decrypted[i]);
     }
     printf("\n");
@@ -863,10 +873,10 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
 
         // init resp buffers
         uint8_t* rep_buffer = (uint8_t*) malloc(
-            sizeof(ra_samp_response_header_t) + msg_size
+            sizeof(ra_samp_response_header_t) + ocr_input_size
         );
         memset(rep_buffer, 0, 
-            sizeof(ra_samp_response_header_t) + msg_size
+            sizeof(ra_samp_response_header_t) + ocr_input_size
         );
         ra_samp_response_header_t* rep_header = (ra_samp_response_header_t*) rep_buffer; 
 
@@ -883,6 +893,7 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
         return 0;
     }
 
+    /*
     life_input_t* input = (life_input_t*) malloc(msg_size);
     input->size = size;
     input->steps = steps;
@@ -890,6 +901,7 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
     input->array[3] = '1';
     input->array[4] = '1';
     input->array[5] = '1';
+    */
 
 
 
@@ -901,16 +913,16 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
 
     // init p_att_result_msg_full (header + payload)
     uint8_t* rep_buffer = (uint8_t*) malloc(
-        sizeof(ra_samp_response_header_t) + msg_size
+        sizeof(ra_samp_response_header_t) + ocr_input_size
     );
     rep_header = (ra_samp_response_header_t*) rep_buffer; 
 
     memset(rep_buffer, 0, 
-        sizeof(ra_samp_response_header_t) + msg_size
+        sizeof(ra_samp_response_header_t) + ocr_input_size
     );
 
     rep_header->type = 6;
-    rep_header->size = msg_size;
+    rep_header->size = ocr_input_size;
 
     #ifdef MYDEBUG 
     printf("MESSAGE SIZE: %d\n", rep_header->size);
@@ -921,8 +933,8 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
     uint8_t* tmp = (uint8_t*) ocr_input;
     // printing input
     #ifdef MYDEBUG 
-    printf("Created an input message. Size: %lu\n", msg_size);
-    for(int i = 0; i < msg_size; i++){
+    printf("Created an input message. Size: %lu\n", ocr_input_size);
+    for(int i = 0; i < ocr_input_size; i++){
         //printf("%c ", input->array[i*size + j]);
         printf("%d ", tmp[i]);
     } 
@@ -940,7 +952,7 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
     }
     printf("\n");
     #endif
-    uint8_t* ebuf =  (uint8_t*) malloc (msg_size); //(uint8_t*) p_att_result_msg;
+    uint8_t* ebuf =  (uint8_t*) malloc (ocr_input_size); //(uint8_t*) p_att_result_msg;
 
     /*
     ret = sample_rijndael128GCM_encrypt(
@@ -959,7 +971,7 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
     encrypt(
         global_key,
         tmp,
-        msg_size,
+        ocr_input_size,
         ebuf,
         &aes_gcm_iv[0],
         SAMPLE_SP_IV_SIZE,
@@ -970,11 +982,11 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
 
 
 
-    uint8_t buf_test[msg_size];
+    uint8_t buf_test[ocr_input_size];
     decrypt(
         global_key,
         ebuf,
-        msg_size,
+        ocr_input_size,
         buf_test,
         &aes_gcm_iv[0],
         SAMPLE_SP_IV_SIZE,
@@ -985,7 +997,7 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
 
     #ifdef MYDEBUG 
     printf("Test dect: \n");
-    for (int i = 0; i < msg_size; ++i)
+    for (int i = 0; i < ocr_input_size; ++i)
     {
         printf("%d ", buf_test[i]);
     }
@@ -993,22 +1005,22 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
     #endif
 
 
-    memcpy(rep_buffer + sizeof(ra_samp_response_header_t), ebuf, msg_size);
+    memcpy(rep_buffer + sizeof(ra_samp_response_header_t), ebuf, ocr_input_size);
 
     #ifdef MYDEBUG 
     printf("Printing payload:\n");
-        for (int i = 0; i < msg_size; ++i) {
+        for (int i = 0; i < ocr_input_size; ++i) {
             printf("%d ", rep_buffer[i]);//p_att_result_msg[i]);
         }
         printf("\n");
 
-        for (int i = 0; i < msg_size; ++i) {
+        for (int i = 0; i < ocr_input_size; ++i) {
             printf("%d ", ebuf[i]);//p_att_result_msg[i]);
         }
         printf("\n");
     #endif
 
-    free(input);
+    //free(input);
     
     #ifdef MYDEBUG 
     fprintf(stderr, "Encryption Done.\n");
@@ -1034,6 +1046,7 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
 
 
 // Process remote attestation message input
+/*
 int sp_ra_proc_msg_input_req(const sample_ra_msg_input_t *p_msg3, uint32_t msg3_size,
     ra_samp_response_header_t **pp_att_result_msg)
 {
@@ -1085,13 +1098,13 @@ int sp_ra_proc_msg_input_req(const sample_ra_msg_input_t *p_msg3, uint32_t msg3_
 
         uint8_t aes_gcm_iv[SAMPLE_SP_IV_SIZE] = {0};
       
-        /*
-        p_att_result_msg->secret.payload_size = msg_size;
-        if((IAS_QUOTE_OK == attestation_report.status) &&
-           (IAS_PSE_OK == attestation_report.pse_status) &&
-           (isv_policy_passed == true))
-        {
-        */
+        
+        //p_att_result_msg->secret.payload_size = msg_size;
+        //if((IAS_QUOTE_OK == attestation_report.status) &&
+        //   (IAS_PSE_OK == attestation_report.pse_status) &&
+        //   (isv_policy_passed == true))
+        //{
+        
 
             ret = sample_rijndael128GCM_encrypt(&g_sp_db.sk_key,
                         (uint8_t*) input,
@@ -1102,9 +1115,9 @@ int sp_ra_proc_msg_input_req(const sample_ra_msg_input_t *p_msg3, uint32_t msg3_
                         NULL,
                         0,
                         &p_att_result_msg->secret.payload_tag);
-        /*
-        }
-        */
+        
+        //}
+        
     }while(0);
 
     if(ret)
@@ -1119,4 +1132,6 @@ int sp_ra_proc_msg_input_req(const sample_ra_msg_input_t *p_msg3, uint32_t msg3_
     }
     return ret;
 }
+ocr_input_size
 
+*/
