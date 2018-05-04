@@ -772,6 +772,13 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
                         &p_att_result_msg->secret.payload_tag);
         }
 
+        printf("ENCRYPTION KEY: ");
+        for (int i = 0; i < 16; ++i)
+        {
+            printf("%d ", g_sp_db.sk_key[i]);
+        }
+        printf("\n");
+
         #ifdef MYDEBUG 
         printf("Printing size: %d\n", ocr_input_size);
         printf("Printing payload:\n");
