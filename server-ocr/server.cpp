@@ -124,6 +124,7 @@ int main(int argc , char *argv[]) {
         if(read_size == 0) {
             PRINT("[server] Client disconnected\n");
             fflush(stdout);
+            close(socket_desc); close(client_sock);
             return 0;
         }
         else if(read_size == -1) {
@@ -169,7 +170,7 @@ int main(int argc , char *argv[]) {
             
             iter_counter = 0;
             ra_free_network_response_buffer(p_resp_full);
-            close(socket_desc); close(client_sock);
+            close(client_sock);
             exit(0);
           }
 
