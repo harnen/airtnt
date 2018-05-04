@@ -101,9 +101,11 @@ int ra_network_send_receive(const char *server_url,
 
     int wrote = 0;
     int read = 0;
-    wrote = boost::asio::write(s, 
-                               boost::asio::buffer(p_req, 
-                               p_req->size + sizeof (ra_samp_request_header_t)));
+    while(wrote < (p_req->size + sizeof (ra_samp_request_header_t))){
+        wrote += boost::asio::write(s, 
+                                   boost::asio::buffer(p_req + wrote, 
+                                   p_req->size + sizeof (ra_samp_request_header_t) - wrote));
+    }
 
     PRINT("Wrote %d bytes of Msg %d declared size %d\n", wrote, p_req->type, p_req->size);
 
