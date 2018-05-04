@@ -68,7 +68,7 @@ int main(int argc , char *argv[]) {
         }
     }
     */
-    memcpy(ocr_input->payload, input, rows * cols);
+    memcpy(ocr_input->payload, input, rows*cols*sizeof(int));
     PRINT("[server] OCR Image size: %d (rows: %d, cols: %d)\n", ocr_input_size, rows, cols);
      
     // create socket
