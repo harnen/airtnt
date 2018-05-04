@@ -43,8 +43,8 @@ int main(int argc , char *argv[]) {
     char const *image_input = "./data/input_5_OK.png";
     vector< vector<int> > pixels;
     if (load_image(image_input, &pixels) != 0) {
-      PRINT("[server] Could not load input image: %s\n", image_input);
-      return -1;
+        PRINT("[server] Could not load input image: %s\n", image_input);
+        return -1;
     }
 
     // convert input to C type 
@@ -66,14 +66,14 @@ int main(int argc , char *argv[]) {
             ocr_input->payload[i*rows+j] = input[i][j];
         }
     }
-    PRINT("[server] OCR Image size: %d (rows: %d, cols: %d)", ocr_input_size, rows, cols);
+    PRINT("[server] OCR Image size: %d (rows: %d, cols: %d)\n", ocr_input_size, rows, cols);
      
     // create socket
     socket_desc = socket(AF_INET , SOCK_STREAM , 0);
     if (socket_desc == -1) {
-        PRINT("[server] Could not create socket");
+        PRINT("[server] Could not create socket\n");
     }
-    PRINT("[server] Socket created");
+    PRINT("[server] Socket created\n");
      
     // prepare the sockaddr_in structure
     server.sin_family = AF_INET;
@@ -83,25 +83,25 @@ int main(int argc , char *argv[]) {
     // bind
     if( bind(socket_desc,(struct sockaddr *)&server , sizeof(server)) < 0) {
         //print the error message
-        PRINT("[ERROR][server] bind failed. Error");
+        PRINT("[ERROR][server] bind failed\n");
         return 1;
     }
-    PRINT("[server] bind done");
+    PRINT("[server] bind done\n");
      
     // listen
     listen(socket_desc , 3);
      
     // accept and incoming connection
-    PRINT("[server] Waiting for incoming connections...");
+    PRINT("[server] Waiting for incoming connections...\n");
     c = sizeof(struct sockaddr_in);
      
     // accept connection from an incoming client
     client_sock = accept(socket_desc, (struct sockaddr *)&client, (socklen_t*)&c);
     if (client_sock < 0) {
-        PRINT("[ERROR][server] accept failed");
+        PRINT("[ERROR][server] accept failed\n");
         return 1;
     }
-    PRINT("[server] Connection accepted");
+    PRINT("[server] Connection accepted\n");
      
     //////////////////////////////////////////
     // main loop
@@ -116,26 +116,26 @@ int main(int argc , char *argv[]) {
         // read header
         read_size = recv(client_sock, client_message, sizeof(ra_samp_request_header_t), 0);
         ra_samp_request_header_t *header = (ra_samp_request_header_t*) client_message;
-        PRINT("[server] Received header (type: %d, size: %d)", header->type, header->size);
-        PRINT("[server] Received header size: %d", read_size);
+        PRINT("[server] Received header (type: %d, size: %d)\n", header->type, header->size);
+        PRINT("[server] Received header size: %d\n", read_size);
         iter_counter++;
 
         // exit if read zero
         if(read_size == 0) {
-            PRINT("[server] Client disconnected");
+            PRINT("[server] Client disconnected\n");
             fflush(stdout);
             return 0;
         }
         else if(read_size == -1) {
-            PRINT("[ERROR][server] recv failed");
+            PRINT("[ERROR][server] recv failed\n");
             return -1;
         } 
 
         // read body
         read_size = recv(client_sock, client_message+sizeof(ra_samp_request_header_t), header->size, 0); 
-        PRINT("[server] Received body size: %d", read_size);
+        PRINT("[server] Received body size: %d\n", read_size);
         if (header->size != read_size) {
-            PRINT("[ERROR][server] Received size: %d, while expecting: %d", read_size, header->size);
+            PRINT("[ERROR][server] Received size: %d, while expecting: %d\n", read_size, header->size);
             return -1;
         }
 
@@ -153,9 +153,9 @@ int main(int argc , char *argv[]) {
         // send the message back to client
         int response_size = sizeof(ra_samp_response_header_t) + p_resp_full->size;
         int wrote_size = write(client_sock , p_resp_full , response_size);
-        PRINT("[server] Response size: %d", wrote_size);
+        PRINT("[server] Response size: %d\n", wrote_size);
         if (response_size != wrote_size) {
-            PRINT("[ERROR][server] Response size: %d, while expecting: %d", wrote_size, response_size);
+            PRINT("[ERROR][server] Response size: %d, while expecting: %d\n", wrote_size, response_size);
             return -1;
         }
 

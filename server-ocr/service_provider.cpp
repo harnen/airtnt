@@ -1033,7 +1033,7 @@ int sp_ra_proc_msg_output_req(const char *p_output,
     #ifdef MYDEBUG 
     ocr_input_t* ocr_input2 = (ocr_input_t*) buf_test;
     printf("Test dect payload: \n");
-    for (int i = 0; i < ocr_input_size; ++i)
+    for (int i = 0; i < ocr_input2->rows * ocr_input2->cols; ++i)
     {
         printf("%d ", ocr_input2->payload[i]);
     }
