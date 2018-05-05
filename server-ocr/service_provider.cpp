@@ -955,6 +955,11 @@ int sp_ra_proc_msg_output_req(const char *p_output,
     #endif 
 
 
+    // adapt remaining steps
+    if (steps > max_iterations-counter) {
+        ocr_input->iter = max_iterations-counter;
+    }
+
 
     uint8_t* tmp = (uint8_t*) ocr_input;
     // printing input
