@@ -370,7 +370,8 @@ sgx_status_t put_secret_data(
     int** letters_c, 
     int letters_rows,
     char *output_letters, 
-    int *length)
+    int *length,
+    uint32_t iter)
 {
     sgx_status_t ret = SGX_SUCCESS;
     sgx_ec_key_128bit_t sk_key;
@@ -421,22 +422,25 @@ sgx_status_t put_secret_data(
 /*        ocall_print("\nDecrypted input"); 
         for(int i = 0; i < secret_size; i++){
             ocall_print_int(g_secret[i]);
-        }*/
+        }
 
-/*        ocall_print("\ninput->rows"); ocall_print_int(input->rows); 
+        ocall_print("\ninput->rows"); ocall_print_int(input->rows); 
         ocall_print("\ni;nput->cols"); ocall_print_int(input->cols); 
         ocall_print("\ninput->payload");
         ocall_print("\ninput->payload"); 
         for(int i = 0; i < (input->rows * input->cols); i++){
             ocall_print_int(input->payload[i]);
-        }*/
+        }
+*/
 
-        character_recognition_wrap(input, ocr_input_size, letters_c, letters_rows, output_letters, length);
+        for(int i = 0; i < iter; i++){
+            character_recognition_wrap(input, ocr_input_size, letters_c, letters_rows, output_letters, length);
+        }
 
-        ocall_print("\nFound letters"); 
+        /*ocall_print("\nFound letters"); 
         for(int i = 0; i < *length; i++){
             ocall_print_char(output_letters[i]);
-        }
+        }*/
         /*
          * Encrypt the computed results
          */
