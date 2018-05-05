@@ -817,7 +817,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
         // copy to global
         memcpy(global_key, g_sp_db.sk_key, sizeof(sample_aes_gcm_128bit_key_t));
 
-        counter += steps;
+        
 
 
     }while(0);
@@ -831,7 +831,18 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
     {
         // Freed by the network simulator in ra_free_network_response_buffer
         *pp_att_result_msg = p_att_result_msg_full;
+
+        if (steps > max_iterations-counter) {
+            (*pp_att_result_msg)->steps = max_iterations-counter;
+        }
+        else {
+            (*pp_att_result_msg)->steps = steps;
+        }
+
     }
+
+    counter += steps;
+    
     return ret;
 }
 
@@ -1064,6 +1075,13 @@ int sp_ra_proc_msg_output_req(const char *p_output,
     *pp_att_result_msg = (ra_samp_response_header_t*) rep_buffer;
 /*    printf("p_att_result_msg pointer: %d\n", p_att_result_msg);
     printf("pp_att_result_msg pointer: %d\n", *pp_att_result_msg);*/
+
+    if (steps > max_iterations-counter) {
+        (*pp_att_result_msg)->steps = max_iterations-counter;
+    }
+    else {
+        (*pp_att_result_msg)->steps = steps;
+    }
 
     #ifdef MYDEBUG 
     fprintf(stderr, "Assignment Done.\n");

@@ -16,7 +16,6 @@ typedef struct ocr_input
     int rows;
     int cols;
     int iter;
-    int iter_max;
     int payload[]; 
 } ocr_input_t;
 

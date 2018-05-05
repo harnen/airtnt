@@ -60,7 +60,6 @@ int main(int argc , char *argv[]) {
     unsigned long ocr_input_size = sizeof(ocr_input_t) + (rows * cols * sizeof(int));
     ocr_input_t* ocr_input = (ocr_input_t*)malloc(ocr_input_size);
     ocr_input->iter = steps;
-    ocr_input->iter_max = max_iterations;
     ocr_input->rows = rows;
     ocr_input->cols = cols;
     for (int i=0; i < rows; ++i) {
