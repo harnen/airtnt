@@ -959,7 +959,10 @@ int sp_ra_proc_msg_output_req(const char *p_output,
     if (steps > max_iterations-counter) {
         ocr_input->iter = max_iterations-counter;
     }
-    printf("max_iterations-counter: %d\n", max_iterations-counter);
+    else {
+        ocr_input->iter = steps;
+    }
+    PRINT("max_iterations-counter: %d\n", max_iterations-counter);
 
 
     uint8_t* tmp = (uint8_t*) ocr_input;
