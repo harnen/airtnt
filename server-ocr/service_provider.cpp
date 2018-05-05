@@ -960,7 +960,7 @@ int sp_ra_proc_msg_output_req(const char *p_output,
         ocr_input->iter = max_iterations-counter;
     }
     else {
-        ocr_input->iter = steps;
+        ocr_input->iter = 10;
     }
     PRINT("max_iterations-counter: %d\n", max_iterations-counter);
 
