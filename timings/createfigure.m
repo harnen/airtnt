@@ -10,17 +10,23 @@ function createfigure(X, Y, measure, legend_title, log_scale, smooth_plot)
 if smooth_plot
     line_width = 2;
 else
-    line_width = 0.75;
+    line_width = 1.5;
 end
 marker_size = 10;
 font_size = 12;
 
 % Color
+% line_color = [
+%     0 0 0;
+%     0 0.447058826684952 0.74117648601532;
+%     0.8500    0.3250    0.0980;
+%     0.9290    0.6940    0.1250;
+%     ];
 line_color = [
     0 0 0;
     0 0.447058826684952 0.74117648601532;
-    0.8500    0.3250    0.0980;
-    0.9290    0.6940    0.1250;
+    0.850980401039124 0.325490206480026 0.0980392172932625;
+    0.929411768913269 0.694117665290833 0.125490203499794;
     ];
 light_gray = [0.501960813999176 0.501960813999176 0.501960813999176];
 dark_gray = [0.313725501298904 0.313725501298904 0.313725501298904];
@@ -62,7 +68,7 @@ for i=1:size(Y,2)
         xx = x;
         yy = smooth(y);
     else
-        xx = x(1):10:x(end);
+        xx = linspace(x(1),x(end),1000);
         yy = spline(x,y,xx);
         mask = yy<0;
         yy(mask) = 0;
@@ -84,19 +90,22 @@ end
 % Set the remaining axes properties
 set(gca,'FontSize',font_size,'FontWeight',font_weight,...
     'XColor',light_gray,'YColor',light_gray,'ZColor',light_gray, ...
-    'XGrid','off', 'YGrid','on');
+    'XGrid','off', 'YGrid','on',...
+    'Box', 'on');
 
 % Axes labels
 xlabel('Cycles');
 ylabel(measure);
 
 % Legend
-legend1 = legend(p,legend_title);
-set(legend1,...
-    'TextColor',dark_gray,...
-    'FontSize',font_size,...
-    'FontWeight',font_weight,...
-    'EdgeColor',[1 1 1]);
+if ~isempty(legend_title)
+    legend1 = legend(p,legend_title);
+    set(legend1,...
+        'TextColor',dark_gray,...
+        'FontSize',font_size,...
+        'FontWeight',font_weight,...
+        'EdgeColor',[1 1 1]);
+end
 
 % Window size
 fig = gcf;
