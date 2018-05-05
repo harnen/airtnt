@@ -151,6 +151,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
                         uint32_t msg3_size,
                         ra_samp_response_header_t **pp_att_result_msg, 
                         int steps, 
+                        int max_iterations,
                         ocr_input_t* ocr_input
                         );
 
