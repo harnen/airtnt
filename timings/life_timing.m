@@ -3,20 +3,12 @@ clc;
 
 %% config
 % config - Game of Life
-% folder_path = './life-data';
-% file_format = 'parsed_log_size=%d.dat.%d';
-% num_measurements = 10;
-% num_cycles = 99;
-% matrix_sizes = [10 25 50];
-% legend_title = {'10x10 matrix', '25x25 matrix', '50x50 matrix'};
-
-% config - OCR
-folder_path = './ocr-data';
-file_format = 'parsed_ocr_log=%d.dat.%d';
+folder_path = './life-data';
+file_format = 'parsed_log_size=%d.dat.%d';
 num_measurements = 10;
 num_cycles = 99;
-matrix_sizes = [1];
-legend_title = {};
+matrix_sizes = [10 25 50];
+legend_title = {'10x10 matrix', '25x25 matrix', '50x50 matrix'};
 
 
 %% parse data
@@ -60,6 +52,4 @@ createfigure(cycles, mean_total_time,...
     'Total Time [ms]', legend_title, log_scale, smooth_plot);
 createfigure(cycles, mean_enclave_time,...
     'Enclave Time [ms]', legend_title, log_scale, smooth_plot);
-
-plot(cycles, std_enclave_tim(:,1))
 

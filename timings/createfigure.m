@@ -15,13 +15,6 @@ end
 marker_size = 10;
 font_size = 12;
 
-% Color
-% line_color = [
-%     0 0 0;
-%     0 0.447058826684952 0.74117648601532;
-%     0.8500    0.3250    0.0980;
-%     0.9290    0.6940    0.1250;
-%     ];
 line_color = [
     0 0 0;
     0 0.447058826684952 0.74117648601532;
@@ -104,6 +97,7 @@ if ~isempty(legend_title)
         'TextColor',dark_gray,...
         'FontSize',font_size,...
         'FontWeight',font_weight,...
+        'Location','northwest',...
         'EdgeColor',[1 1 1]);
 end
 
