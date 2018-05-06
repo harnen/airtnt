@@ -77,7 +77,7 @@ for i=1:size(Y,2)
     end
     
     % Hold
-    hold on;
+    hold on; 
 end
 
 % Set the remaining axes properties
