@@ -71,7 +71,7 @@ int connect(std::string url, std::string port){
     PRINT("Socket created");
      
 //    server.sin_addr.s_addr = inet_addr("18.130.38.222");
-    server.sin_addr.s_addr = inet_addr("18.130.60.110");
+    server.sin_addr.s_addr = inet_addr("18.130.86.186");
     server.sin_family = AF_INET;
     server.sin_port = htons(8000);
  
