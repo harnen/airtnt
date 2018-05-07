@@ -87,8 +87,12 @@ set(gca,'FontSize',font_size,'FontWeight',font_weight,...
     'Box', 'on');
 
 % Axes labels
-xlabel('Cycles');
-ylabel(measure);
+xlabel('cycles (d)');
+if log_scale
+    ylabel(strcat({'(logarithmic) '}, measure));
+else 
+    ylabel(measure);
+end
 
 % Legend
 if ~isempty(legend_title)
@@ -96,8 +100,7 @@ if ~isempty(legend_title)
     set(legend1,...
         'TextColor',dark_gray,...
         'FontSize',font_size,...
-        'FontWeight',font_weight,...
-        'Location','northwest',...
+        'FontWeight',font_weight,... %'Location','northwest',...
         'EdgeColor',[1 1 1]);
 end
 
