@@ -143,8 +143,8 @@ void session(tcp::socket sock)
         gettimeofday(&t_finished,NULL);
         unsigned long m_finished = 1000000 * t_finished.tv_sec + t_finished.tv_usec;
         printf("Time connected [us] %lu, time finished [us] %lu, time diff [us] %lu, iterations %d\n", m_connected, m_finished, m_finished - m_connected, iter_counter);
-        printf("Bytes received: %d\n", bytes_received_sum);
-        printf("Bytes sent: %d \n", bytes_sent_sum);
+        printf("Bytes received: %ld\n", bytes_received_sum);
+        printf("Bytes sent: %ld \n", bytes_sent_sum);
         
         iter_counter = 0;
 
