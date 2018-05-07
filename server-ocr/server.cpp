@@ -23,6 +23,9 @@ using namespace std;
 
 #define MAX_MESSAGE_LEN 20000
 
+long bytes_sent_sum = 0;
+long bytes_received_sum = 0;
+
 
 /**
  *
@@ -140,6 +143,9 @@ int main(int argc , char *argv[]) {
             return -1;
         } 
 
+        bytes_received_sum += read_size;
+
+
         // read body
         read_size = 0;
         while(read_size < header->size) {
@@ -154,6 +160,8 @@ int main(int argc , char *argv[]) {
             PRINT("[ERROR][server] Received size: %d, while expecting: %d\n", read_size, header->size);
             return -1;
         }
+
+        bytes_received_sum += read_size;
 
         // pass to SGX attestation
         ra_samp_response_header_t *p_resp_full = NULL;
@@ -175,6 +183,8 @@ int main(int argc , char *argv[]) {
             return -1;
         }
 
+        bytes_received_sum += wrote_size;;
+
         // exit & print time
         if((!p_resp_full->size) && (p_resp_full->type == 6)){
             gettimeofday(&t_finished,NULL);
@@ -182,6 +192,9 @@ int main(int argc , char *argv[]) {
             printf("Time connected [us] %lu, time finished [us] %lu, time diff [us] %lu, iterations %d\n", 
                 m_connected, m_finished, m_finished - m_connected, iter_counter
             );
+            printf("Bytes received: %ld\n", bytes_received_sum);
+            printf("Bytes sent: %ld \n", bytes_sent_sum);
+
             
             iter_counter = 0;
             ra_free_network_response_buffer(p_resp_full);
