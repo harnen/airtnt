@@ -34,10 +34,15 @@ for i=1:length(matrix_sizes)
         enclave_time(:,j) = data(:,3) ./ 1e6;
     end
     
-    % apply simulated network delay
-    for k=1:size(total_time, 1)
-        for l=1:size(total_time, 2)
-            total_time(k,l) = total_time(k,l) + (k-1)*total_time(1,l);
+    % apply simulated network delay    
+    for l=1:size(total_time, 2) 
+        for k=1:size(total_time, 1)
+            
+            
+            iter = ceil(1000/cycles(k)); % num of iterations
+            comm_time = (total_time(k,l) - enclave_time(k,l)) / iter;
+            total_time(k,l) = enclave_time(k,l) + 1000*comm_time;
+       
         end
     end
 
@@ -45,18 +50,17 @@ for i=1:length(matrix_sizes)
     mean_total_time(:,i) = mean(total_time,2);
     mean_enclave_time(:,i) = mean(enclave_time,2);
     std_total_time(:,i) = std(total_time,[],2);
-    std_enclave_time(:,i) = std(enclave_time,[],2);
-    
-    end
+    std_enclave_time(:,i) = std(enclave_time,[],2); 
+end
     
     
 %% plot
-log_scale = 1;
+log_scale = 0;
 smooth_plot = 0;
 createfigure(cycles, mean_total_time,...
-    'Total Time [s]', legend_title, log_scale, smooth_plot);
+    'client latency [s]', legend_title, log_scale, smooth_plot);
 createfigure(cycles, mean_enclave_time,...
-    'Enclave Time [s]', legend_title, log_scale, smooth_plot);
+    'enclave time [s]', legend_title, log_scale, smooth_plot);
 
 %figure;
 %boundedline(cycles,mean_enclave_time,std_enclave_time, '-rx')
