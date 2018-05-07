@@ -449,7 +449,7 @@ int sp_ra_proc_msg1_req(const sample_ra_msg1_t *p_msg1,
 // Process remote attestation message 3
 int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
                         uint32_t msg3_size,
-                        ra_samp_response_header_t **pp_att_result_msg, int steps)
+                        ra_samp_response_header_t **pp_att_result_msg, int steps, int max_iterations)
 {
 
     int ret = 0;
