@@ -365,7 +365,8 @@ sgx_status_t put_secret_data(
     uint8_t* result,
     int* result_size,
     sgx_aes_gcm_128bit_key_t* result_key,
-    sgx_aes_gcm_128bit_tag_t* out_mac)
+    sgx_aes_gcm_128bit_tag_t* out_mac,
+    uint32_t iter)
 {
     sgx_status_t ret = SGX_SUCCESS;
     sgx_ec_key_128bit_t sk_key;
@@ -401,8 +402,10 @@ sgx_status_t put_secret_data(
          */
 
         life_input_t* input = (life_input_t*) g_secret;
+        input->steps = iter;
         int size = input->size;
-        int steps = input->steps;
+//        int steps = input->steps;
+        
         simulate(input->size, input->steps, input->array);
 
         /*

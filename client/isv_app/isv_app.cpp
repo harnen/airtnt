@@ -677,6 +677,7 @@ int main(int argc, char* argv[])
         memcpy(payload_tag, p_att_result_msg_body->secret.payload_tag, sizeof(sgx_aes_gcm_128bit_tag_t));
         struct timeval t_started, t_stopped;
         unsigned long m_sum = 0;
+        uint32_t iter = p_att_result_msg_full->steps;
  
         int counter = 0;       
         if(attestation_passed)
@@ -695,7 +696,7 @@ int main(int argc, char* argv[])
                 }
 
                 sgx_aes_gcm_128bit_tag_t out_mac;
-
+                PRINT("Will perform %d iterations\n", iter);
                 gettimeofday(&t_started,NULL);
                 unsigned long m_started = 1000000 * t_started.tv_sec + t_started.tv_usec;
                 ret = put_secret_data(enclave_id,
@@ -707,7 +708,8 @@ int main(int argc, char* argv[])
                                   result,
                                   &result_size,
                                   &result_key,
-                                  &out_mac);
+                                  &out_mac,
+                                  iter);
                 
                 gettimeofday(&t_stopped,NULL);
                 unsigned long m_stopped = 1000000 * t_stopped.tv_sec + t_stopped.tv_usec;
@@ -736,6 +738,9 @@ int main(int argc, char* argv[])
                 int rett = ra_network_send_receive("http://SampleServiceProvider.intel.com/",
                                         p_msg_result,
                                         (ra_samp_response_header_t**) &p_msg_reply); //TODO: Change it - for now, we don't assume any response
+
+                ra_samp_response_header_t* header_pointer = (ra_samp_response_header_t*) p_msg_reply;
+                iter = header_pointer->steps;
                 free(p_msg_result);
 
                 if(rett){PRINT("Finishing the loop"); ret = 0;  break;}

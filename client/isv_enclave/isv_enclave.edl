@@ -54,7 +54,8 @@ enclave {
                                             [out,size=secret_size] uint8_t* result,
                                             [out] int* result_size,
                                             [out] sgx_aes_gcm_128bit_key_t* result_key,
-                                            [out] sgx_aes_gcm_128bit_tag_t* out_mac
+                                            [out] sgx_aes_gcm_128bit_tag_t* out_mac,
+                                            uint32_t iter
                                             );
     };
 
