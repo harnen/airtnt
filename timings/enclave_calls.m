@@ -63,10 +63,10 @@ log_scale = 0;
 smooth_plot = 1;
 
 enclave_calls_fig(num_enclave_calls, life_mean_enclave_time,...
-    'Enclave Time [ms]', {'Game of Life'}, log_scale, smooth_plot);
+    'enclave time [ms]', {'Game of Life'}, log_scale, smooth_plot);
 
 enclave_calls_fig(num_enclave_calls, ocr_mean_enclave_time,...
-    'Enclave Time [s]', {'OCR'}, log_scale, smooth_plot);
+    'enclave time [s]', {'OCR'}, log_scale, smooth_plot);
 
 
 
