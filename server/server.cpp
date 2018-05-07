@@ -35,7 +35,8 @@ chat_message read_msg_;
 
 int steps=0;
 int max_iterations=0;
-
+long bytes_sent_sum = 0;
+long bytes_received_sum = 0;
 int iter_counter=0;
 ////////////////////////////////
 // END EDIT
@@ -61,6 +62,8 @@ void session(tcp::socket sock)
         throw boost::system::system_error(error); // Some other error.
       }
       iter_counter++;
+
+     bytes_received_sum += length;
 
       ra_samp_request_header_t *header = (ra_samp_request_header_t*) data;
 
@@ -89,6 +92,7 @@ void session(tcp::socket sock)
         }
       }
       
+     bytes_received_sum += read_bytes;;
       
       #ifdef MYDEBUG 
       ra_samp_request_header_t* tmp = (ra_samp_request_header_t*) data;
@@ -128,6 +132,9 @@ void session(tcp::socket sock)
       }
 
 
+     bytes_sent_sum += wrote_bytes;
+
+
       #ifdef MYDEBUG 
       printf("Hoped write: %d\n", sizeof(ra_samp_response_header_t) + p_msg0_resp_full->size);
       #endif 
@@ -136,6 +143,8 @@ void session(tcp::socket sock)
         gettimeofday(&t_finished,NULL);
         unsigned long m_finished = 1000000 * t_finished.tv_sec + t_finished.tv_usec;
         printf("Time connected [us] %lu, time finished [us] %lu, time diff [us] %lu, iterations %d\n", m_connected, m_finished, m_finished - m_connected, iter_counter);
+        printf("Bytes received: %d\n", bytes_received_sum);
+        printf("Bytes sent: %d \n", bytes_sent_sum);
         
         iter_counter = 0;
 
