@@ -87,8 +87,12 @@ set(gca,'FontSize',font_size,'FontWeight',font_weight,...
     'Box', 'on');
 
 % Axes labels
-xlabel('Enclave Calls');
-ylabel(measure);
+xlabel('number of enclave calls');
+if log_scale
+    ylabel(strcat({'(logarithmic) '}, measure));
+else 
+    ylabel(measure);
+end
 
 % Legend
 if ~isempty(legend_title)

@@ -8,7 +8,7 @@ file_format = 'parsed_log_size=%d.dat.%d';
 num_measurements = 10;
 num_cycles = 99;
 matrix_sizes = [10 25 50];
-legend_title = {'10x10 matrix', '25x25 matrix', '50x50 matrix'};
+legend_title = {'10x10 grid', '25x25 grid', '50x50 grid'};
 
 
 %% parse data
@@ -49,7 +49,7 @@ end
 log_scale = 0;
 smooth_plot = 0;
 createfigure(cycles, mean_total_time,...
-    'Total Time [ms]', legend_title, log_scale, smooth_plot);
+    'client latency [ms]', legend_title, log_scale, smooth_plot);
 createfigure(cycles, mean_enclave_time,...
-    'Enclave Time [ms]', legend_title, log_scale, smooth_plot);
+    'enclave time [ms]', legend_title, log_scale, smooth_plot);
 
