@@ -449,7 +449,7 @@ int sp_ra_proc_msg1_req(const sample_ra_msg1_t *p_msg1,
 // Process remote attestation message 3
 int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
                         uint32_t msg3_size,
-                        ra_samp_response_header_t **pp_att_result_msg, int steps)
+                        ra_samp_response_header_t **pp_att_result_msg, int steps, int max_iterations)
 {
 
     int ret = 0;
@@ -778,7 +778,7 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
         // copy to global
         memcpy(global_key, g_sp_db.sk_key, sizeof(sample_aes_gcm_128bit_key_t));
 
-        counter += steps;
+        
 
 
     }while(0);
@@ -792,6 +792,16 @@ int sp_ra_proc_msg3_req(const sample_ra_msg3_t *p_msg3,
     {
         // Freed by the network simulator in ra_free_network_response_buffer
         *pp_att_result_msg = p_att_result_msg_full;
+
+        if (steps > max_iterations-counter) {
+            (*pp_att_result_msg)->steps = max_iterations-counter;
+        }
+        else {
+            (*pp_att_result_msg)->steps = steps;
+        }
+
+        counter += steps;
+
     }
     return ret;
 }
@@ -1008,6 +1018,13 @@ int sp_ra_proc_msg_output_req(const life_input_t *p_output,
 /*    printf("p_att_result_msg pointer: %d\n", p_att_result_msg);
     printf("pp_att_result_msg pointer: %d\n", *pp_att_result_msg);*/
 
+    if (steps > max_iterations-counter) {
+        (*pp_att_result_msg)->steps = max_iterations-counter;
+    }
+    else {
+        (*pp_att_result_msg)->steps = steps;
+    }
+
     #ifdef MYDEBUG 
     fprintf(stderr, "Assignment Done.\n");
     #endif
@@ -1106,6 +1123,8 @@ int sp_ra_proc_msg_input_req(const sample_ra_msg_input_t *p_msg3, uint32_t msg3_
     {
         // Freed by the network simulator in ra_free_network_response_buffer
         *pp_att_result_msg = p_att_result_msg_full;
+
+
     }
     return ret;
 }

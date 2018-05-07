@@ -67,6 +67,7 @@ typedef enum _ias_msg_type_t
 typedef struct _ra_samp_request_header_t{
     uint8_t  type;     /* set to one of ra_msg_type_t*/
     uint32_t size;     /*size of request body*/
+    uint32_t steps;
     uint8_t  align[3];
     uint8_t body[];
 }ra_samp_request_header_t;
@@ -75,6 +76,7 @@ typedef struct _ra_samp_response_header_t{
     uint8_t  type;      /* set to one of ra_msg_type_t*/
     uint8_t  status[2];
     uint32_t size;      /*size of the response body*/
+    uint32_t steps;
     uint8_t  align[1];
     uint8_t  body[];
 }ra_samp_response_header_t;
