@@ -183,7 +183,7 @@ int main(int argc , char *argv[]) {
             return -1;
         }
 
-        bytes_received_sum += wrote_size;;
+        bytes_sent_sum += wrote_size;;
 
         // exit & print time
         if((!p_resp_full->size) && (p_resp_full->type == 6)){
