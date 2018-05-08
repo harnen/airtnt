@@ -59,7 +59,7 @@ end
 
 
 %% plot
-log_scale = 0;
+log_scale = 1;
 smooth_plot = 1;
 
 enclave_calls_fig(num_enclave_calls, life_mean_enclave_time,...

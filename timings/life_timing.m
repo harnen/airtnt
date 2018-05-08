@@ -24,6 +24,7 @@ for i=1:length(matrix_sizes)
     % init
     total_time = zeros(num_cycles,num_measurements);
     enclave_time = zeros(num_cycles,num_measurements);
+    bandwidth = zeros(num_cycles,num_measurements);
 
     % gather measurements
     for j=1:num_measurements
@@ -34,6 +35,7 @@ for i=1:length(matrix_sizes)
         cycles = data(:,1);
         total_time(:,j) = data(:,2) ./ 1e3; % total time in [ms]
         enclave_time(:,j) = data(:,3) ./ 1e3; % enclave time in [ms]
+        bandwidth(:,j) = (data(:,4)+data(:,5)) ./ 1e3;
     end
     
     % compute avg and std
@@ -41,15 +43,21 @@ for i=1:length(matrix_sizes)
     mean_enclave_time(:,i) = mean(enclave_time,2);
     std_total_time(:,i) = std(total_time,[],2);
     std_enclave_tim(:,i) = std(enclave_time,[],2);
+    mean_bandwidth(:,i) = mean(bandwidth,2);
+    std_bandwidth(:,i) = std(bandwidth,[],2);
     
 end
 
 
 %% plot
-log_scale = 0;
+log_scale = 1;
 smooth_plot = 0;
 createfigure(cycles, mean_total_time,...
     'client latency [ms]', legend_title, log_scale, smooth_plot);
+
 createfigure(cycles, mean_enclave_time,...
     'enclave time [ms]', legend_title, log_scale, smooth_plot);
+
+createfigure(cycles, mean_bandwidth,...
+    'total bandwidth [kB]', legend_title, log_scale, smooth_plot);
 

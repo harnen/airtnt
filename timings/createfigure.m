@@ -13,7 +13,7 @@ else
     line_width = 1.5;
 end
 marker_size = 10;
-font_size = 12;
+font_size = 14;
 
 line_color = [
     0 0 0;
