@@ -53,7 +53,7 @@ end
 log_scale = 1;
 smooth_plot = 0;
 createfigure(cycles, mean_total_time,...
-    'client latency [ms]', legend_title, log_scale, smooth_plot);
+    'final state requestor latency [ms]', legend_title, log_scale, smooth_plot);
 
 createfigure(cycles, mean_enclave_time,...
     'enclave time [ms]', legend_title, log_scale, smooth_plot);

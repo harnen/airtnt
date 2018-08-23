@@ -87,7 +87,7 @@ set(gca,'FontSize',font_size,'FontWeight',font_weight,...
     'Box', 'on');
 
 % Axes labels
-xlabel('cycles (d)');
+xlabel('cycles per round');
 if log_scale
     ylabel(strcat({'(logarithmic) '}, measure));
 else 
